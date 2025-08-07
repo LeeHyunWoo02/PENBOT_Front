@@ -123,7 +123,6 @@ const PhoneVerificationPage: React.FC = () => {
       <h2 style={{ fontWeight: 700, fontSize: 32, marginBottom: 24 }}>Verify your phone number</h2>
       <div style={{ color: '#888', marginBottom: 32 }}>We&apos;ve sent you a text with a 6-digit code.</div>
       <form onSubmit={handleSubmit}>
-        {/* 휴대폰 입력 + 인증번호 발송 버튼 (수정/추가) */}
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 20 }}>
           <input
             type="text"

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const PasswordSetupPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -27,10 +28,29 @@ const PasswordSetupPage: React.FC = () => {
     }
     setIsSubmitting(true);
     // TODO: 실제 비밀번호 저장 API 연동
-    setTimeout(() => {
+    try{
+      const token = localStorage.getItem('jwt');
+      const res = await axios.post('http://localhost:8080/api/user/update', 
+        {password: password},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // 만약 Content-Type 필요하면 아래도 추가:
+            'Content-Type': 'application/json'
+          }
+      });
+      console.log(res);
+
+      if (res.data && res.data.accessToken) {
+        localStorage.setItem('jwt', res.data.accessToken);
+      }
       setSuccess('비밀번호가 성공적으로 설정되었습니다!');
-      setIsSubmitting(false);
-    }, 1000);
+      window.location.href = '/';
+    } catch (error) {
+      console.error(error);
+      setError('비밀번호 설정에 실패했습니다.');
+    }
+    setIsSubmitting(false);
   };
 
   return (
