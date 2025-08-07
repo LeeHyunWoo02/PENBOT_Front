@@ -8,6 +8,8 @@ import DirectionsPage from './pages/DirectionsPage';
 import BookingSystemPage from './pages/BookingSystemPage';
 import ChatbotPage from './pages/ChatbotPage';
 import LoginModal from './components/LoginModal';
+import PhoneVerificationPage from './pages/PhoneVerificationPage';
+import PasswordSetupPage from './pages/PasswordSetupPage';
 import './App.css';
 
 function App() {
@@ -16,14 +18,7 @@ function App() {
   const [redirectPath, setRedirectPath] = useState<string | null>(null); // 리다이렉트 경로 저장
 
   const handleLoginClick = () => {
-    if (isLoggedIn) {
-      // 로그인된 상태면 예약 시스템으로 이동
-      window.location.href = '/booking-system';
-    } else {
-      // 로그인되지 않은 상태면 로그인 모달 열기
-      setRedirectPath('/booking-system');
-      setIsLoginModalOpen(true);
-    }
+    setIsLoginModalOpen(true);
   };
 
   const handleChatbotClick = () => {
@@ -45,14 +40,7 @@ function App() {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setIsLoginModalOpen(false);
-    
-    // 리다이렉트 경로가 있으면 해당 경로로, 없으면 홈으로 이동
-    if (redirectPath) {
-      window.location.href = redirectPath;
-      setRedirectPath(null);
-    } else {
-      window.location.href = '/';
-    }
+    window.location.href = '/phone-verification';
   };
 
   return (
@@ -65,6 +53,8 @@ function App() {
           <Route path="/directions" element={<DirectionsPage onLoginClick={handleLoginClick} />} />
           <Route path="/booking-system" element={<BookingSystemPage onLoginClick={handleLoginClick} />} />
           <Route path="/chatbot" element={<ChatbotPage onLoginClick={handleLoginClick} />} />
+          <Route path="/phone-verification" element={<PhoneVerificationPage />} />
+          <Route path="/password-setup" element={<PasswordSetupPage />} />
         </Routes>
       </Layout>
       <LoginModal 

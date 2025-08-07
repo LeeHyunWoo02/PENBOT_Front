@@ -77,39 +77,39 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick }) => {
           alignItems: 'center'
         }}>
           <button
-            onClick={onChatbotClick}
+            onClick={onLoginClick}
             style={{
               background: '#2196f3',
               color: '#fff',
               border: 'none',
               borderRadius: 8,
-              padding: '10px 20px',
-              fontSize: 14,
-              fontWeight: 500,
+              padding: '10px 28px',
+              fontSize: 16,
+              fontWeight: 600,
               cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6
+              letterSpacing: 1,
             }}
           >
-            <span>🤖</span>
-            AI 챗봇
+            로그인
           </button>
-          <button
-            onClick={onLoginClick}
+          <Link
+            to="/booking-system"
             style={{
-              background: '#4CAF50',
-              color: '#fff',
-              border: 'none',
+              background: '#fff',
+              color: '#2196f3',
+              border: '2px solid #2196f3',
               borderRadius: 8,
-              padding: '10px 20px',
-              fontSize: 14,
-              fontWeight: 500,
-              cursor: 'pointer'
+              padding: '10px 24px',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              textDecoration: 'none',
+              marginLeft: 4,
+              display: 'inline-block',
             }}
           >
-            예약하기
-          </button>
+            실시간 예약
+          </Link>
         </div>
       </div>
     </header>
