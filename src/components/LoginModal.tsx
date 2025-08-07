@@ -7,16 +7,13 @@ interface LoginModalProps {
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
-  const handleLogin = (provider: string) => {
+  const handleLogin =  (provider: string) => {
     // 실제 로그인 로직은 여기에 구현
     console.log(`${provider}로 로그인 시도`);
-    
-    // 임시로 로그인 성공 처리
-    if (onLoginSuccess) {
-      onLoginSuccess();
-    } else {
-      onClose();
-    }
+
+     window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`
+
+
   };
 
   if (!isOpen) return null;
@@ -124,6 +121,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             카카오로 계속하기
           </button>
 
+          {/* 네이버 로그인 버튼 */}
           <button 
             onClick={() => handleLogin('naver')}
             style={{

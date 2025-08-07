@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 interface HeaderProps {
   onLoginClick: () => void;
   onChatbotClick?: () => void;
+  isLoggedIn?: boolean; // 추가
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick }) => {
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick, isLoggedIn }) => {
   return (
     <header style={{
       backgroundColor: '#1a1a1a',
@@ -76,22 +77,26 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick }) => {
           gap: 16,
           alignItems: 'center'
         }}>
-          <button
-            onClick={onLoginClick}
-            style={{
-              background: '#2196f3',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '10px 28px',
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-              letterSpacing: 1,
-            }}
-          >
-            로그인
-          </button>
+          {/* 로그인 상태가 아니면 로그인 버튼 표시 */}
+          {!isLoggedIn && (
+            <button
+              onClick={onLoginClick}
+              style={{
+                background: '#2196f3',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 8,
+                padding: '10px 28px',
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+                letterSpacing: 1,
+              }}
+            >
+              로그인
+            </button>
+          )}
+          {/* 실시간 예약 버튼은 항상 표시 */}
           <Link
             to="/booking-system"
             style={{

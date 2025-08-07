@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
@@ -10,12 +10,29 @@ import ChatbotPage from './pages/ChatbotPage';
 import LoginModal from './components/LoginModal';
 import PhoneVerificationPage from './pages/PhoneVerificationPage';
 import PasswordSetupPage from './pages/PasswordSetupPage';
+import OAuth2Redirect from './pages/OAuth2Redirect';
 import './App.css';
 
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
   const [redirectPath, setRedirectPath] = useState<string | null>(null); // 리다이렉트 경로 저장
+
+  // 앱 로드 시 localStorage에 jwt 토큰이 있으면 로그인 상태로 설정 (수정/추가)
+  useEffect(() => {
+    const token = localStorage.getItem('jwt');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // 소셜 로그인 후 토큰이 저장되면 로그인 상태 갱신 (수정/추가)
+  useEffect(() => {
+    const onStorage = () => {
+      const token = localStorage.getItem('jwt');
+      setIsLoggedIn(!!token);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const handleLoginClick = () => {
     setIsLoginModalOpen(true);
@@ -45,7 +62,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <Layout onLoginClick={handleLoginClick} onChatbotClick={handleChatbotClick}>
+      <Layout onLoginClick={handleLoginClick} onChatbotClick={handleChatbotClick} isLoggedIn={isLoggedIn}>
         <Routes>
           <Route path="/" element={<HomePage onLoginClick={handleLoginClick} onChatbotClick={handleChatbotClick} />} />
           <Route path="/introduction" element={<IntroductionPage onLoginClick={handleLoginClick} />} />
@@ -55,6 +72,7 @@ function App() {
           <Route path="/chatbot" element={<ChatbotPage onLoginClick={handleLoginClick} />} />
           <Route path="/phone-verification" element={<PhoneVerificationPage />} />
           <Route path="/password-setup" element={<PasswordSetupPage />} />
+          <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
         </Routes>
       </Layout>
       <LoginModal 
