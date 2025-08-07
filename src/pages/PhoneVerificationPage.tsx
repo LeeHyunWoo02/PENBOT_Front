@@ -98,9 +98,11 @@ const PhoneVerificationPage: React.FC = () => {
           const res = await fetch('http://localhost:8080/api/verify/verifycode', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, code: codeValue }),
+            body: JSON.stringify({ phone, code: code.join('') }),
           });
+          console.log(res.body);
           const data = await res.json();
+          console.log(data);
           if (res.ok) {
             setSendMsg(data.message || '인증번호 인증에 성공했습니다.');
             // 인증 성공 시 비밀번호 설정 페이지로 이동
