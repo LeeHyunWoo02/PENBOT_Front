@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { isHost } from '../utils/jwtUtils';
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -97,28 +98,57 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick, isLoggedI
             </button>
           )}
           
-          {/* 로그인된 상태면 마이페이지 버튼 표시 */}
+          {/* 로그인된 상태면 권한에 따라 다른 버튼 표시 */}
           {isLoggedIn && (
-            <Link
-              to="/mypage"
-              style={{
-                background: '#fff',
-                color: '#333',
-                border: '1px solid #ddd',
-                borderRadius: 8,
-                padding: '8px 16px',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: 'pointer',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <span>👤</span>
-              마이페이지
-            </Link>
+            <>
+              {/* HOST 권한이면 관리자 대시보드 버튼 표시 */}
+              {isHost() && (
+                <Link
+                  to="/admin-dashboard"
+                  style={{
+                    background: '#ff6b35',
+                    color: '#fff',
+                    border: '1px solid #ff6b35',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>⚙️</span>
+                  관리자 대시보드
+                </Link>
+              )}
+              
+              {/* 일반 사용자면 마이페이지 버튼 표시 */}
+              {!isHost() && (
+                <Link
+                  to="/mypage"
+                  style={{
+                    background: '#fff',
+                    color: '#333',
+                    border: '1px solid #ddd',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>👤</span>
+                  마이페이지
+                </Link>
+              )}
+            </>
           )}
           
           {/* 실시간 예약 버튼은 항상 표시 */}
