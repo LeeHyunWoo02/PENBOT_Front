@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 
 interface BookingSystemPageProps {
@@ -135,6 +136,100 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
     const nights = Math.ceil((selectedEndDate.getTime() - selectedStartDate.getTime()) / (1000 * 60 * 60 * 24));
     return `${startDateStr} ~ ${endDateStr} (${nights}박)`;
   };
+
+  // 종료일 없으면 +1 반환 ( 1일 예약 가능하게 함 )
+  const getEndDateForAPI = () => {
+    if (selectedEndDate) return selectedEndDate;
+    if (selectedStartDate) {
+      const nextDay = new Date(selectedStartDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      return nextDay;
+    }
+    return null;
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toISOString().slice(0, 10);
+  };
+
+
+  const handleCheckAvailability = async () => {
+    if (!selectedStartDate ) {
+      alert('날짜를 선택해주세요.');
+      return;
+    }
+
+    const endDate = getEndDateForAPI();
+    if (!endDate) {
+      alert('종료일 계산에 실패했습니다.');
+      return;
+    }
+
+    const params = {
+      startDate: formatDate(selectedStartDate),
+      endDate: formatDate(endDate),
+    };
+  
+    try {
+      const res = await axios.get('http://localhost:8080/api/bookings/available',{
+        params
+      });
+      console.log(res.data);
+      alert('예약이 가능합니다다!');
+    
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        alert('예약 불가능: ' + error.response.data.message);
+      } else {
+        alert('예약 가능 여부 조회 중 오류가 발생했습니다.');
+      }
+    }
+  }
+  const [loading, setLoading] = useState(false);
+
+
+  const handleBooking = async () => {
+    if(loading) return;
+
+    setLoading(true);
+
+    if (!selectedStartDate || !guestCount) {
+      alert('모든 정보를 입력해 주세요.');
+      return;
+    }
+    const endDate = getEndDateForAPI();
+    if (!endDate) {
+      alert('종료일 계산에 실패했습니다.');
+      return;   
+    }
+
+    const body = {
+      startDate: formatDate(selectedStartDate),
+      endDate: formatDate(endDate),
+      headcount: Number(guestCount),
+    };
+    
+    try {
+      const token = localStorage.getItem('jwt');
+      if (!token) {
+        alert('로그인이 필요합니다.');
+        onLoginClick(); 
+        return;
+      }
+      const res = await axios.post('http://localhost:8080/api/bookings/', body, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert('예약이 완료되었습니다!');
+      window.location.href = '/';
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        alert('예약 실패: ' + error.response.data.message);
+      } else {
+        alert('예약 중 오류가 발생했습니다.');
+      }
+    }
+    setLoading(false);
+  }
 
   return (
     <div style={{ 
@@ -360,13 +455,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
 
             {/* 가용성 확인 버튼 */}
             <button
-              onClick={() => {
-                if (selectedStartDate && guestCount) {
-                  alert('가용성을 확인하고 있습니다...');
-                } else {
-                  alert('날짜와 투숙객 수를 모두 선택해 주세요.');
-                }
-              }}
+              onClick={handleCheckAvailability}
               style={{
                 width: '100%',
                 background: '#2196f3',
@@ -385,13 +474,8 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
 
             {/* 예약하기 버튼 */}
             <button
-              onClick={() => {
-                if (selectedStartDate && guestCount) {
-                  alert('예약이 완료되었습니다!');
-                } else {
-                  alert('모든 정보를 입력해 주세요.');
-                }
-              }}
+              onClick={handleBooking}
+              disabled={loading}
               style={{
                 width: '100%',
                 background: '#4CAF50',
