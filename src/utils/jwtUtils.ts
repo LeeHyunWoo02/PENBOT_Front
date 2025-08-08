@@ -1,6 +1,6 @@
 interface JWTPayload {
   sub: string;
-  chatRole: string;
+  role: string;
   exp: number;
   iat: number;
 }
@@ -27,12 +27,12 @@ export const getUserRole = (): string | null => {
   if (!token) return null;
   const payload = parseJWT(token);
   // chatRole 기준으로 role 반환
-  if (payload?.chatRole) return payload.chatRole;
+  if (payload?.role) return payload.role;
 
   return null;
 };
 
 export const isHost = (): boolean => {
   const role = getUserRole();
-  return role === 'HOST';
+  return role === 'ROLE_HOST';
 };

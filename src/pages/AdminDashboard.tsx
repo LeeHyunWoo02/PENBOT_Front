@@ -1,28 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isHost } from '../utils/jwtUtils';
+import axios from 'axios';
 
 interface Booking {
-  id: string;
-  guestName: string;
-  roomType: string;
-  checkIn: string;
-  checkOut: string;
-  status: 'Confirmed' | 'Cancelled' | 'Pending';
+  bookingId: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  headcount: number;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED'
 }
 
-interface Room {
-  id: string;
-  name: string;
-  type: string;
-  status: 'Available' | 'Occupied' | 'Blocked';
-}
+
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [rooms, setRooms] = useState<Room[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -32,59 +27,24 @@ const AdminDashboard: React.FC = () => {
       navigate('/');
       return;
     }
+    console.log(token);
+    const fetchBookings = async () => {
+      try {
+        const res = await axios.get('http://localhost:8080/api/host/bookings', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // res.data가 배열일 때 바로 setBookings, 아니라면 변환 필요
+        console.log('예약 API 응답 : ', res.data);
+        setBookings(res.data);
+      } catch (error: any) {
+        alert('예약 내역 조회에 실패했습니다.');
+      }
+    };
 
-    // 샘플 데이터 로드
-    loadSampleData();
+    fetchBookings();
   }, [navigate]);
 
-  const loadSampleData = () => {
-    // 샘플 예약 데이터
-    const sampleBookings: Booking[] = [
-      {
-        id: '1',
-        guestName: 'Ethan Harper',
-        roomType: 'Family Suite',
-        checkIn: '2024-07-15',
-        checkOut: '2024-07-20',
-        status: 'Confirmed'
-      },
-      {
-        id: '2',
-        guestName: 'Sophia Clark',
-        roomType: 'Double Room',
-        checkIn: '2024-07-15',
-        checkOut: '2024-07-18',
-        status: 'Confirmed'
-      },
-      {
-        id: '3',
-        guestName: 'Liam Foster',
-        roomType: 'Single Room',
-        checkIn: '2024-07-15',
-        checkOut: '2024-07-16',
-        status: 'Confirmed'
-      },
-      {
-        id: '4',
-        guestName: 'Olivia Morgan',
-        roomType: 'Double Room',
-        checkIn: '2024-07-15',
-        checkOut: '2024-07-18',
-        status: 'Cancelled'
-      }
-    ];
 
-    // 샘플 객실 데이터
-    const sampleRooms: Room[] = [
-      { id: '1', name: '101', type: 'Single Room', status: 'Occupied' },
-      { id: '2', name: '102', type: 'Double Room', status: 'Available' },
-      { id: '3', name: '201', type: 'Family Suite', status: 'Occupied' },
-      { id: '4', name: '202', type: 'Double Room', status: 'Blocked' }
-    ];
-
-    setBookings(sampleBookings);
-    setRooms(sampleRooms);
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
@@ -111,8 +71,8 @@ const AdminDashboard: React.FC = () => {
   };
 
   const filteredBookings = bookings.filter(booking =>
-    booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    booking.roomType.toLowerCase().includes(searchTerm.toLowerCase())
+    booking.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    booking.bookingId.toString().includes(searchTerm)  
   );
 
   return (
@@ -240,9 +200,8 @@ const AdminDashboard: React.FC = () => {
             }}>
               {[
                 { title: 'Total Bookings', value: bookings.length, color: '#2196f3' },
-                { title: 'Confirmed', value: bookings.filter(b => b.status === 'Confirmed').length, color: '#4caf50' },
-                { title: 'Cancelled', value: bookings.filter(b => b.status === 'Cancelled').length, color: '#f44336' },
-                { title: 'Available Rooms', value: rooms.filter(r => r.status === 'Available').length, color: '#ff9800' }
+                { title: 'Confirmed', value: bookings.filter(b => b.status === 'CONFIRMED').length, color: '#4caf50' },
+                { title: 'Cancelled', value: bookings.filter(b => b.status === 'CANCELLED').length, color: '#f44336' },
               ].map((stat, index) => (
                 <div key={index} style={{
                   background: '#2d2d2d',
@@ -330,92 +289,30 @@ const AdminDashboard: React.FC = () => {
               </div>
 
               {/* 예약 테이블 */}
-              <div style={{
-                overflowX: 'auto'
-              }}>
+              <div style={{ overflowX: 'auto' }}>
                 <table style={{
                   width: '100%',
                   borderCollapse: 'collapse'
                 }}>
                   <thead>
-                    <tr style={{
-                      borderBottom: '1px solid #444'
-                    }}>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontSize: '14px',
-                        color: '#aaa'
-                      }}>
-                        Guest Name
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontSize: '14px',
-                        color: '#aaa'
-                      }}>
-                        Room Type
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontSize: '14px',
-                        color: '#aaa'
-                      }}>
-                        Check-in
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontSize: '14px',
-                        color: '#aaa'
-                      }}>
-                        Check-out
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontSize: '14px',
-                        color: '#aaa'
-                      }}>
-                        Status
-                      </th>
+                    <tr style={{ borderBottom: '1px solid #444' }}>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Booking ID</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Guest Name</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Check-in</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Check-out</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Headcount</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredBookings.map(booking => (
-                      <tr key={booking.id} style={{
-                        borderBottom: '1px solid #333'
-                      }}>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {booking.guestName}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {booking.roomType}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {booking.checkIn}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {booking.checkOut}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
+                      <tr key={booking.bookingId} style={{ borderBottom: '1px solid #333' }}>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>{booking.bookingId}</td>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>{booking.name}</td>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>{booking.startDate}</td>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>{booking.endDate}</td>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>{booking.headcount}</td>
+                        <td style={{ padding: '12px', fontSize: '14px' }}>
                           <span style={{
                             background: getStatusColor(booking.status),
                             color: '#fff',
@@ -528,41 +425,6 @@ const AdminDashboard: React.FC = () => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {rooms.map(room => (
-                      <tr key={room.id} style={{
-                        borderBottom: '1px solid #333'
-                      }}>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {room.name}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          {room.type}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          fontSize: '14px'
-                        }}>
-                          <span style={{
-                            background: getStatusColor(room.status),
-                            color: '#fff',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            fontSize: '12px',
-                            fontWeight: '500'
-                          }}>
-                            {room.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
                 </table>
               </div>
             </div>
