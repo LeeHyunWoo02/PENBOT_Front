@@ -96,6 +96,31 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick, isLoggedI
               로그인
             </button>
           )}
+          
+          {/* 로그인된 상태면 마이페이지 버튼 표시 */}
+          {isLoggedIn && (
+            <Link
+              to="/mypage"
+              style={{
+                background: '#fff',
+                color: '#333',
+                border: '1px solid #ddd',
+                borderRadius: 8,
+                padding: '8px 16px',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <span>👤</span>
+              마이페이지
+            </Link>
+          )}
+          
           {/* 실시간 예약 버튼은 항상 표시 */}
           <Link
             to="/booking-system"

@@ -7,6 +7,7 @@ import BookingPage from './pages/BookingPage';
 import DirectionsPage from './pages/DirectionsPage';
 import BookingSystemPage from './pages/BookingSystemPage';
 import ChatbotPage from './pages/ChatbotPage';
+import MyPage from './pages/MyPage';
 import LoginModal from './components/LoginModal';
 import PhoneVerificationPage from './pages/PhoneVerificationPage';
 import PasswordSetupPage from './pages/PasswordSetupPage';
@@ -70,6 +71,7 @@ function App() {
           <Route path="/directions" element={<DirectionsPage onLoginClick={handleLoginClick} />} />
           <Route path="/booking-system" element={<BookingSystemPage onLoginClick={handleLoginClick} />} />
           <Route path="/chatbot" element={<ChatbotPage onLoginClick={handleLoginClick} />} />
+          <Route path="/mypage" element={<MyPage />} />
           <Route path="/phone-verification" element={<PhoneVerificationPage />} />
           <Route path="/password-setup" element={<PasswordSetupPage />} />
           <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
