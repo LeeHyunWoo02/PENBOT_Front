@@ -21,6 +21,15 @@ interface BlockedDate {
   type: 'BLOCKED' | 'BOOKED' | string; // 서버가 주는 값
 }
 
+interface User {
+  userId: number;
+  email: string;
+  name: string;
+  phone: string;
+  createdAt: string;
+  role: string;
+}
+
 
 
 const AdminDashboard: React.FC = () => {
@@ -38,6 +47,12 @@ const AdminDashboard: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [blockReason, setBlockReason] = useState('');
+
+  // User 관련 상태
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isUserDetailModalOpen, setIsUserDetailModalOpen] = useState(false);
+  const [userSearchTerm, setUserSearchTerm] = useState('');
 
   useEffect(() => {
     // 로그인 상태 및 HOST 권한 확인
@@ -71,8 +86,21 @@ const AdminDashboard: React.FC = () => {
       }
     };
 
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get('http://localhost:8080/api/host/users', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        console.log('유저 API 응답 : ', res.data);
+        setUsers(res.data);
+      } catch (error: any) {
+        console.error('유저 목록 조회에 실패했습니다.', error);
+      }
+    };
+
     fetchBookings();
     fetchBlockedDates();
+    fetchUsers();
   }, [navigate]);
 
 
@@ -179,6 +207,52 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  // User 관련 함수들
+
+  const openUserDetailModal = async (userId: number) => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const res = await axios.get<User>(`http://localhost:8080/api/host/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSelectedUser(res.data);
+      setIsUserDetailModalOpen(true);
+    } catch (error) {
+      console.error('유저 상세 조회 실패', error);
+      alert('유저 정보 조회에 실패했습니다.');
+    }
+  };
+
+  const closeUserDetailModal = () => {
+    setSelectedUser(null);
+    setIsUserDetailModalOpen(false);
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!window.confirm('정말로 이 유저를 삭제하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('jwt');
+      await axios.delete(`http://localhost:8080/api/host/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert('유저가 성공적으로 삭제되었습니다.');
+      closeUserDetailModal();
+      
+      // 유저 목록 새로고침
+      const res = await axios.get('http://localhost:8080/api/host/users', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUsers(res.data);
+    } catch (error: any) {
+      console.error('유저 삭제에 실패했습니다.', error);
+      alert('유저 삭제에 실패했습니다.');
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Confirmed':
@@ -245,7 +319,6 @@ const AdminDashboard: React.FC = () => {
           {[
             { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
             { id: 'bookings', label: 'Bookings', icon: '📅' },
-            { id: 'rooms', label: 'Rooms', icon: '🛏️' },
             { id: 'guests', label: 'Guests', icon: '👥' },
             { id: 'settings', label: 'Settings', icon: '⚙️' }
           ].map(item => (
@@ -657,17 +730,150 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'rooms' && (
-          <div>
-            <h2>Room Management</h2>
-            <p>객실 관리 기능이 여기에 표시됩니다.</p>
-          </div>
-        )}
-
         {activeTab === 'guests' && (
           <div>
-            <h2>Guest Management</h2>
-            <p>게스트 관리 기능이 여기에 표시됩니다.</p>
+            <div style={{
+              marginBottom: '30px'
+            }}>
+              <h2 style={{
+                fontSize: '28px',
+                fontWeight: 'bold',
+                margin: '0 0 10px 0'
+              }}>
+                유저 관리
+              </h2>
+              <p style={{
+                color: '#aaa',
+                fontSize: '16px',
+                margin: 0
+              }}>
+                가입된 모든 유저 정보를 확인하고 관리하세요
+              </p>
+            </div>
+
+            {/* 검색 바 */}
+            <div style={{
+              background: '#2d2d2d',
+              borderRadius: '12px',
+              padding: '20px',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                display: 'flex',
+                gap: '10px',
+                marginBottom: '20px'
+              }}>
+                <input
+                  type="text"
+                  placeholder="유저명 또는 이메일로 검색하세요"
+                  value={userSearchTerm}
+                  onChange={(e) => setUserSearchTerm(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: '10px 12px',
+                    border: '1px solid #444',
+                    borderRadius: '6px',
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 유저 목록 테이블 */}
+            <div style={{
+              background: '#2d2d2d',
+              borderRadius: '12px',
+              padding: '20px'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 'bold',
+                margin: '0 0 20px 0'
+              }}>
+                가입 유저 목록
+              </h3>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse'
+                }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #444' }}>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>유저 ID</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>이메일</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>이름</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>전화번호</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>역할</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>가입일</th>
+                      <th style={{ padding: '12px', textAlign: 'left', fontSize: '14px', color: '#aaa' }}>액션</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.filter(user => 
+                      user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                      user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+                    ).length > 0 ? (
+                      users.filter(user => 
+                        user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+                        user.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+                      ).map(user => (
+                        <tr key={user.userId} style={{ borderBottom: '1px solid #333' }}>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>{user.userId}</td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>{user.email}</td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>{user.name}</td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>{user.phone}</td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            <span style={{
+                              background: user.role === 'HOST' ? '#4caf50' : '#2196f3',
+                              color: '#fff',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: '500'
+                            }}>
+                              {user.role}
+                            </span>
+                          </td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+                          </td>
+                          <td style={{ padding: '12px', fontSize: '14px' }}>
+                            <button
+                              onClick={() => openUserDetailModal(user.userId)}
+                              style={{
+                                background: '#2196f3',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                fontWeight: '500',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              상세보기
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} style={{ 
+                          padding: '40px', 
+                          textAlign: 'center', 
+                          color: '#aaa',
+                          fontSize: '16px'
+                        }}>
+                          {userSearchTerm ? '검색 결과가 없습니다.' : '등록된 유저가 없습니다.'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1158,6 +1364,183 @@ const AdminDashboard: React.FC = () => {
             }}>
               <button
                 onClick={closeBlockCancelModal}
+                style={{
+                  background: '#444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 유저 상세보기 모달 */}
+      {isUserDetailModalOpen && selectedUser && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#2d2d2d',
+            borderRadius: '12px',
+            padding: '30px',
+            width: '500px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            {/* 모달 헤더 */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px',
+              paddingBottom: '15px',
+              borderBottom: '1px solid #444'
+            }}>
+              <h3 style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                margin: 0,
+                color: '#fff'
+              }}>
+                유저 상세 정보
+              </h3>
+              <button
+                onClick={closeUserDetailModal}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#aaa',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  padding: '5px',
+                  borderRadius: '4px'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* 모달 콘텐츠 */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '15px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>유저 ID:</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedUser.userId}</span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>이메일:</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedUser.email}</span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>이름:</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedUser.name}</span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>전화번호:</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedUser.phone}</span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>권한한:</span>
+                <span style={{
+                  background: selectedUser.role === 'HOST' ? '#4caf50' : '#2196f3',
+                  color: '#fff',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: '500'
+                }}>
+                  {selectedUser.role}
+                </span>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '10px 0',
+                borderBottom: '1px solid #333'
+              }}>
+                <span style={{ color: '#aaa', fontSize: '14px' }}>가입일:</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>
+                  {new Date(selectedUser.createdAt).toLocaleString('ko-KR')}
+                </span>
+              </div>
+            </div>
+
+            {/* 모달 푸터 */}
+            <div style={{
+              marginTop: '30px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: '10px'
+            }}>
+              <button
+                onClick={() => handleDeleteUser(selectedUser.userId)}
+                style={{
+                  background: '#f44336',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '10px 20px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer'
+                }}
+              >
+                유저 삭제
+              </button>
+              <button
+                onClick={closeUserDetailModal}
                 style={{
                   background: '#444',
                   color: '#fff',
