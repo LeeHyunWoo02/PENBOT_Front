@@ -26,13 +26,13 @@ const OAuth2Redirect: React.FC = () => {
       localStorage.setItem('jwt', accessToken); // JWT 토큰 저장
       const payload = decodeJwt(accessToken);
       console.log(payload);
-      console.log(payload?.chatRole);
+      console.log(payload?.role);
 
-      if (payload?.chatRole === "TEMP") {
+      if (payload?.role === "ROLE_TEMP") {
         console.log("TEMP 유저는 인증 페이지로 이동합니다.");
         window.location.href = '/phone-verification';
         // navigate('/phone-verification');
-      } else if (payload?.chatRole === "GUEST" || payload?.chatRole === "HOST") {
+      } else if (payload?.role === "ROLE_GUEST" || payload?.role === "ROLE_HOST") {
         navigate('/');
       } else {
         // 기타 상황 (예: 토큰에 role 정보 없거나 이상할 때)

@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { callGeminiAPI } from '../utils/chatbotApi';
 
 interface Message {
   id: string;
   text: string;
   isUser: boolean;
   timestamp: Date;
+  isReservationQuestion?: boolean;
 }
 
 interface ChatbotPageProps {
@@ -17,7 +19,8 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
       id: '1',
       text: '안녕하세요! 라온아띠 AI 어시스턴트입니다. 무엇을 도와드릴까요?',
       isUser: false,
-      timestamp: new Date()
+      timestamp: new Date(),
+      isReservationQuestion: false
     }
   ]);
   const [inputText, setInputText] = useState('');
@@ -39,62 +42,37 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
       id: Date.now().toString(),
       text: inputText,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
     setIsTyping(true);
 
-    // 임시 응답 (실제로는 백엔드 API 호출)
-    setTimeout(() => {
+    try {
+      // Gemini API 호출
+      const response = await callGeminiAPI(inputText);
+      
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputText),
+        text: response.result,
         isUser: false,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
+      
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('챗봇 응답 처리 중 오류:', error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        text: '죄송합니다. 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+        isUser: false,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
-  };
-
-  const getBotResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('예약') || input.includes('예약하기')) {
-      return '예약에 대해 문의하시는군요! 언제 체크인하실 예정인가요? 몇 명이 투숙하실 예정인가요?';
     }
-    
-    if (input.includes('가격') || input.includes('요금') || input.includes('비용')) {
-      return '라온아띠 독채 풀빌라의 요금은 다음과 같습니다:\n\n평일: 200,000원/박\n주말: 250,000원/박\n성수기: 300,000원/박\n\n정확한 요금은 예약하시는 날짜에 따라 달라질 수 있습니다.';
-    }
-    
-    if (input.includes('위치') || input.includes('주소') || input.includes('찾아오는 길')) {
-      return '라온아띠는 강원도 평창군 진부면에 위치해 있습니다. 평창역에서 차로 약 15분 거리이며, 진부면사무소 근처에서 "라온아띠" 간판을 찾으시면 됩니다.';
-    }
-    
-    if (input.includes('시설') || input.includes('편의시설') || input.includes('어떤 시설')) {
-      return '라온아띠 독채 풀빌라는 다음과 같은 시설을 제공합니다:\n\n• 완비된 주방\n• BBQ 시설\n• 개인 수영장\n• 넓은 정원\n• 주차 공간\n• 무료 Wi-Fi\n• 에어컨/난방\n\n최대 15명까지 투숙 가능합니다.';
-    }
-    
-    if (input.includes('체크인') || input.includes('체크아웃')) {
-      return '체크인 시간: 오후 3시\n체크아웃 시간: 오전 11시\n\n조기 체크인이나 늦은 체크아웃이 필요하시면 사전에 문의해 주세요.';
-    }
-    
-    if (input.includes('취소') || input.includes('환불')) {
-      return '예약 취소 정책은 다음과 같습니다:\n\n• 7일 전 취소: 100% 환불\n• 3-7일 전 취소: 50% 환불\n• 3일 이내 취소: 환불 불가\n\n자세한 사항은 고객센터로 문의해 주세요.';
-    }
-    
-    if (input.includes('반려동물') || input.includes('강아지') || input.includes('고양이')) {
-      return '죄송합니다. 라온아띠는 반려동물 동반 투숙이 불가능합니다. 편안한 휴식을 위해 다른 고객님들의 이용에 방해가 되지 않도록 협조해 주시기 바랍니다.';
-    }
-    
-    if (input.includes('연락처') || input.includes('전화번호') || input.includes('문의')) {
-      return '라온아띠 고객센터 연락처입니다:\n\n📞 전화: (010) 1234-5678\n📧 이메일: info@raonatti.com\n\n평일 오전 9시 ~ 오후 6시까지 문의 가능합니다.';
-    }
-    
-    return '죄송합니다. 질문을 정확히 이해하지 못했습니다. 예약, 가격, 위치, 시설, 체크인/아웃, 취소 정책 등에 대해 문의해 주시면 자세히 안내해 드리겠습니다.';
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -140,6 +118,33 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
         }}>
           실시간으로 문의사항을 해결해 드립니다
         </p>
+        <div style={{
+          marginTop: 12,
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 16
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            color: '#ff9800'
+          }}>
+            <span>🏨</span>
+            <span>예약 관련 질문</span>
+          </div>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12,
+            color: '#4caf50'
+          }}>
+            <span>💬</span>
+            <span>자유 질문</span>
+          </div>
+        </div>
       </div>
 
       {/* 채팅 영역 */}
@@ -186,22 +191,37 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
                       width: 32,
                       height: 32,
                       borderRadius: '50%',
-                      backgroundColor: '#2196f3',
+                      backgroundColor: message.isReservationQuestion ? '#ff9800' : '#2196f3',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginRight: 8,
                       fontSize: 16
                     }}>
-                      🤖
+                      {message.isReservationQuestion ? '🏨' : '🤖'}
                     </div>
                   )}
                   <div style={{
                     fontSize: 12,
                     color: message.isUser ? 'rgba(255,255,255,0.7)' : '#666',
-                    marginBottom: 4
+                    marginBottom: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4
                   }}>
                     {message.isUser ? '나' : '라온아띠 AI'}
+                    {!message.isUser && message.isReservationQuestion && (
+                      <span style={{
+                        fontSize: 10,
+                        backgroundColor: '#ff9800',
+                        color: '#fff',
+                        padding: '2px 6px',
+                        borderRadius: 8,
+                        fontWeight: 500
+                      }}>
+                        예약
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div style={{
@@ -306,25 +326,40 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
           borderRadius: 12,
           border: '1px solid #e9ecef'
         }}>
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="메시지를 입력하세요..."
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              borderRadius: 24,
-              border: '1px solid #ddd',
-              fontSize: 14,
-              resize: 'none',
-              minHeight: 48,
-              maxHeight: 120,
-              fontFamily: 'inherit',
-              outline: 'none'
-            }}
-            rows={1}
-          />
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            flex: 1
+          }}>
+            <textarea
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="메시지를 입력하세요..."
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: 24,
+                border: '1px solid #ddd',
+                fontSize: 14,
+                resize: 'none',
+                minHeight: 48,
+                maxHeight: 120,
+                fontFamily: 'inherit',
+                outline: 'none'
+              }}
+              rows={1}
+            />
+            <div style={{
+              fontSize: 11,
+              color: '#666',
+              padding: '0 4px'
+            }}>
+              💡 예약 관련 질문은 🏨 아이콘으로, 자유 질문은 💬 아이콘으로 구분됩니다
+            </div>
+          </div>
+          
           <button
             onClick={handleSendMessage}
             disabled={!inputText.trim() || isTyping}
@@ -351,38 +386,124 @@ const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
         <div style={{
           marginTop: 20,
           display: 'flex',
-          flexWrap: 'wrap',
-          gap: 8
+          flexDirection: 'column',
+          gap: 16
         }}>
-          {[
-            '예약 문의',
-            '가격 안내',
-            '위치/교통',
-            '시설 정보',
-            '체크인/아웃',
-            '취소 정책'
-          ].map((quickQuestion) => (
-            <button
-              key={quickQuestion}
-              onClick={() => {
-                setInputText(quickQuestion);
-                setTimeout(() => handleSendMessage(), 100);
-              }}
-              disabled={isTyping}
-              style={{
-                padding: '8px 16px',
-                borderRadius: 16,
-                border: '1px solid #ddd',
-                backgroundColor: '#fff',
-                color: '#333',
-                fontSize: 12,
-                cursor: isTyping ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              {quickQuestion}
-            </button>
-          ))}
+          {/* 예약 관련 빠른 질문 */}
+          <div>
+            <h4 style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#333',
+              margin: '0 0 8px 0',
+              padding: '0 4px'
+            }}>
+              🏨 예약 관련 질문
+            </h4>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 8
+            }}>
+              {[
+                '예약 문의',
+                '가격 안내',
+                '체크인/아웃',
+                '인원 문의',
+                '날짜 확인'
+              ].map((quickQuestion) => (
+                <button
+                  key={quickQuestion}
+                  onClick={() => {
+                    setInputText(quickQuestion);
+                    setTimeout(() => handleSendMessage(), 100);
+                  }}
+                  disabled={isTyping}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 16,
+                    border: '1px solid #2196f3',
+                    backgroundColor: '#e3f2fd',
+                    color: '#1976d2',
+                    fontSize: 12,
+                    cursor: isTyping ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    fontWeight: 500
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isTyping) {
+                      e.currentTarget.style.backgroundColor = '#bbdefb';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isTyping) {
+                      e.currentTarget.style.backgroundColor = '#e3f2fd';
+                    }
+                  }}
+                >
+                  {quickQuestion}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 자유 질문 */}
+          <div>
+            <h4 style={{
+              fontSize: 14,
+              fontWeight: 600,
+              color: '#333',
+              margin: '0 0 8px 0',
+              padding: '0 4px'
+            }}>
+              💬 자유 질문
+            </h4>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 8
+            }}>
+              {[
+                '위치/교통',
+                '시설 정보',
+                '주변 관광',
+                '추천 코스',
+                '기타 문의'
+              ].map((quickQuestion) => (
+                <button
+                  key={quickQuestion}
+                  onClick={() => {
+                    setInputText(quickQuestion);
+                    setTimeout(() => handleSendMessage(), 100);
+                  }}
+                  disabled={isTyping}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 16,
+                    border: '1px solid #4caf50',
+                    backgroundColor: '#e8f5e8',
+                    color: '#2e7d32',
+                    fontSize: 12,
+                    cursor: isTyping ? 'not-allowed' : 'pointer',
+                    transition: 'all 0.2s',
+                    fontWeight: 500
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isTyping) {
+                      e.currentTarget.style.backgroundColor = '#c8e6c9';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isTyping) {
+                      e.currentTarget.style.backgroundColor = '#e8f5e8';
+                    }
+                  }}
+                >
+                  {quickQuestion}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
