@@ -38,7 +38,7 @@ const PhoneVerificationPage: React.FC = () => {
     }
     setIsSending(true);
     try {
-      const res = await fetch('http://localhost:8080/api/verify/sendcode', {
+      const res = await fetch('http://13.125.18.129:8080/api/verify/sendcode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone })
@@ -60,7 +60,7 @@ const PhoneVerificationPage: React.FC = () => {
         setError('');
         setIsSending(true);
         try {
-            const res = await fetch('http://localhost:8080/api/verify/verifycode', {
+            const res = await fetch('http://13.125.18.129:8080/api/verify/verifycode', {
                 method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone, code }),
@@ -95,7 +95,7 @@ const PhoneVerificationPage: React.FC = () => {
           return;
         }
         try {
-          const res = await fetch('http://localhost:8080/api/verify/verifycode', {
+          const res = await fetch('http://13.125.18.129:8080/api/verify/verifycode', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ phone, code: code.join('') }),

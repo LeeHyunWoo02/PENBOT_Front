@@ -30,7 +30,7 @@ const PasswordSetupPage: React.FC = () => {
     // TODO: 실제 비밀번호 저장 API 연동
     try{
       const token = localStorage.getItem('jwt');
-      const res = await axios.post('http://localhost:8080/api/user/update', 
+      const res = await axios.post('http://13.125.18.129:8080/api/user/update', 
         {password: password},
         {
           headers: {

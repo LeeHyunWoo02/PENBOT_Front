@@ -13,7 +13,7 @@ export const callGeminiAPI = async (text: string): Promise<ChatbotResponse> => {
 
     const token = localStorage.getItem('jwt');
     
-    const response = await axios.post('http://localhost:8080/api/gemini/ask', 
+    const response = await axios.post('http://13.125.18.129:8080/api/gemini/ask', 
       {
         text
       },

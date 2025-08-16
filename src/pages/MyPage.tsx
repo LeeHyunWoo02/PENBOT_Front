@@ -28,7 +28,7 @@ const MyPage: React.FC = () => {
     // 사용자 정보 불러오기
     const fetchUserInfo = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/user/search', {
+        const res = await axios.get('http://13.125.18.129:8080/api/user/search', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -64,7 +64,7 @@ const AdminDashboard: React.FC = () => {
     console.log(token);
     const fetchBookings = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/host/bookings', {
+        const res = await axios.get('http://13.125.18.129:8080/api/host/bookings', {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('예약 API 응답 : ', res.data);
@@ -76,7 +76,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchBlockedDates = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/host/blocks', {
+        const res = await axios.get('http://13.125.18.129:8080/api/host/blocks', {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Block 날짜 API 응답 : ', res.data);
@@ -88,7 +88,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchUsers = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/host/users', {
+        const res = await axios.get('http://13.125.18.129:8080/api/host/users', {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('유저 API 응답 : ', res.data);
@@ -113,7 +113,7 @@ const AdminDashboard: React.FC = () => {
   const openDetailModal = async (bookingId: number) => {
     try {
       const token = localStorage.getItem('jwt'); // 필요 시 토큰 가져오기
-      const res = await axios.get<Booking>(`http://localhost:8080/api/host/bookings/${bookingId}`, {
+      const res = await axios.get<Booking>(`http://13.125.18.129:8080/api/host/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSelectedBooking(res.data);
@@ -163,7 +163,7 @@ const AdminDashboard: React.FC = () => {
   
     try {
       const token = localStorage.getItem('jwt');
-      await axios.post('http://localhost:8080/api/host/blocks', 
+      await axios.post('http://13.125.18.129:8080/api/host/blocks', 
         {
           startDate,   // YYYY-MM-DD
           endDate,     // YYYY-MM-DD
@@ -176,7 +176,7 @@ const AdminDashboard: React.FC = () => {
       closeBlockModal();
   
       // 차단 목록 새로고침
-      const res = await axios.get('http://localhost:8080/api/host/blocks', {
+      const res = await axios.get('http://13.125.18.129:8080/api/host/blocks', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBlockedDates(res.data);
@@ -190,14 +190,14 @@ const AdminDashboard: React.FC = () => {
   const handleUnblockDate = async (blockedDateId: number) => {
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`http://localhost:8080/api/host/blocks/${blockedDateId}`, {
+      await axios.delete(`http://13.125.18.129:8080/api/host/blocks/${blockedDateId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       alert('차단이 성공적으로 해제되었습니다.');
       
       // 차단된 날짜 목록 새로고침
-      const res = await axios.get('http://localhost:8080/api/host/blocks', {
+      const res = await axios.get('hhttp://13.125.18.129:8080/api/host/blocks', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBlockedDates(res.data);
@@ -212,7 +212,7 @@ const AdminDashboard: React.FC = () => {
   const openUserDetailModal = async (userId: number) => {
     try {
       const token = localStorage.getItem('jwt');
-      const res = await axios.get<User>(`http://localhost:8080/api/host/users/${userId}`, {
+      const res = await axios.get<User>(`http://13.125.18.129:8080/api/host/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSelectedUser(res.data);
@@ -235,7 +235,7 @@ const AdminDashboard: React.FC = () => {
 
     try {
       const token = localStorage.getItem('jwt');
-      await axios.delete(`http://localhost:8080/api/host/users/${userId}`, {
+      await axios.delete(`http://13.125.18.129:8080/api/host/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -243,7 +243,7 @@ const AdminDashboard: React.FC = () => {
       closeUserDetailModal();
       
       // 유저 목록 새로고침
-      const res = await axios.get('http://localhost:8080/api/host/users', {
+      const res = await axios.get('http://13.125.18.129:8080/api/host/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data);
