@@ -61,13 +61,11 @@ const AdminDashboard: React.FC = () => {
       navigate('/');
       return;
     }
-    console.log(token);
     const fetchBookings = async () => {
       try {
         const res = await axios.get('http://13.125.18.129:8080/api/host/bookings', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('예약 API 응답 : ', res.data);
         setBookings(res.data);
       } catch (error: any) {
         alert('예약 내역 조회에 실패했습니다.');
@@ -79,7 +77,6 @@ const AdminDashboard: React.FC = () => {
         const res = await axios.get('http://13.125.18.129:8080/api/host/blocks', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('Block 날짜 API 응답 : ', res.data);
         setBlockedDates(res.data);
       } catch (error: any) {
         console.error('Block 날짜 조회에 실패했습니다.', error);
@@ -91,7 +88,6 @@ const AdminDashboard: React.FC = () => {
         const res = await axios.get('http://13.125.18.129:8080/api/host/users', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        console.log('유저 API 응답 : ', res.data);
         setUsers(res.data);
       } catch (error: any) {
         console.error('유저 목록 조회에 실패했습니다.', error);
@@ -197,7 +193,7 @@ const AdminDashboard: React.FC = () => {
       alert('차단이 성공적으로 해제되었습니다.');
       
       // 차단된 날짜 목록 새로고침
-      const res = await axios.get('hhttp://13.125.18.129:8080/api/host/blocks', {
+      const res = await axios.get('http://13.125.18.129:8080/api/host/blocks', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBlockedDates(res.data);
@@ -250,6 +246,38 @@ const AdminDashboard: React.FC = () => {
     } catch (error: any) {
       console.error('유저 삭제에 실패했습니다.', error);
       alert('유저 삭제에 실패했습니다.');
+    }
+  };
+
+  // 예약 상태 변경 함수 추가
+  const handleUpdateBookingStatus = async (bookingId: number, newStatus: 'CONFIRMED' | 'CANCELLED') => {
+    if (!window.confirm(`예약 상태를 ${newStatus === 'CONFIRMED' ? '확정' : '취소'}하시겠습니까?`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('jwt');
+      
+      await axios.put(`http://13.125.18.129:8080/api/host/bookings/${bookingId}`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      alert(`예약 상태가 성공적으로 ${newStatus === 'CONFIRMED' ? '확정' : '취소'}되었습니다.`);
+      
+      // 예약 목록 새로고침
+      const res = await axios.get('http://13.125.18.129:8080/api/host/bookings', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookings(res.data);
+      
+      // 모달 닫기
+      closeDetailModal();
+    } catch (error: any) {
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      console.error('예약 상태 변경 실패', { status, data });
+      alert('예약 상태 변경에 실패했습니다.');
     }
   };
 
@@ -955,7 +983,7 @@ const AdminDashboard: React.FC = () => {
                 borderBottom: '1px solid #333'
               }}>
                 <span style={{ color: '#aaa', fontSize: '14px' }}>예약 ID:</span>
-                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedBooking.bookingId}</span>
+                <span style={{ color: '#fff', fontSize: '14px', fontWeight: '500' }}>{selectedBooking.bookingId || 'undefined'}</span>
               </div>
 
               <div style={{
@@ -1032,9 +1060,45 @@ const AdminDashboard: React.FC = () => {
             <div style={{
               marginTop: '30px',
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
               gap: '10px'
             }}>
+              {/* 예약 상태 변경 버튼들 - PENDING 상태일 때만 표시 */}
+              {selectedBooking.status === 'PENDING' && (
+                <>
+                  <button
+                    onClick={() => handleUpdateBookingStatus(selectedBooking.bookingId, 'CONFIRMED')}
+                    style={{
+                      background: '#4caf50',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    예약 확정
+                  </button>
+                  <button
+                    onClick={() => handleUpdateBookingStatus(selectedBooking.bookingId, 'CANCELLED')}
+                    style={{
+                      background: '#f44336',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    예약 취소
+                  </button>
+                </>
+              )}
+              
               <button
                 onClick={closeDetailModal}
                 style={{
