@@ -6,47 +6,78 @@ interface DirectionsPageProps {
 
 const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
   useEffect(() => {
-    // 네이버 지도 API 스크립트 로드
-    const script = document.createElement('script');
-    script.src = 'https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=YOUR_CLIENT_ID';
-    script.async = true;
-    script.onload = () => {
-      if (window.naver && window.naver.maps) {
+    if (typeof window === 'undefined') return;
+
+    // 중복 로드 방지
+    const existing = document.querySelector('script[data-naver-maps-loader="true"]') as HTMLScriptElement | null;
+    if (existing && (window as any).naver && (window as any).naver.maps) {
+      console.log('[NaverMap] script already loaded, initializing map');
+      (window as any).initNaverMap?.();
+      return;
+    }
+
+    // 인증 실패 핸들러 (공식 문서 권장 네이밍)
+    (window as any).navermap_authFailure = function () {
+      console.error('[NaverMap] OPENAPI 인증 실패', {
+        origin: window.location.origin,
+        href: window.location.href
+      });
+      alert('네이버 지도 인증에 실패했습니다. 콘솔 로그를 확인하세요.');
+    };
+
+    // 콜백에서 지도 초기화
+    (window as any).initNaverMap = function () {
+      try {
+        console.log('[NaverMap] initNaverMap callback fired');
+        if (!(window as any).naver || !(window as any).naver.maps) {
+          console.error('[NaverMap] naver.maps not available after load');
+          return;
+        }
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) {
+          console.error('[NaverMap] map container not found');
+          return;
+        }
+        const center = new (window as any).naver.maps.LatLng(37.207427, 126.568411);
         const mapOptions = {
-          center: new window.naver.maps.LatLng(37.5665, 126.9780), // 서울 시청 좌표 (실제 펜션 좌표로 변경 필요)
+          center,
           zoom: 15,
           mapTypeControl: true,
-          mapTypeControlOptions: {
-            style: window.naver.maps.MapTypeControlStyle.DROPDOWN
-          }
-        };
+          mapTypeControlOptions: { style: (window as any).naver.maps.MapTypeControlStyle.DROPDOWN }
+        } as any;
+        const map = new (window as any).naver.maps.Map(mapContainer, mapOptions);
+        console.log('[NaverMap] map created', mapOptions);
 
-        const map = new window.naver.maps.Map('map', mapOptions);
-        
-        // 펜션 위치 마커 추가
-        const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(37.5665, 126.9780),
-          map: map
-        });
-
-        // 정보창 추가
-        const infoWindow = new window.naver.maps.InfoWindow({
+        const marker = new (window as any).naver.maps.Marker({ position: center, map });
+        const infoWindow = new (window as any).naver.maps.InfoWindow({
           content: '<div style="padding:10px;text-align:center;"><strong>라온아띠 키즈 펜션</strong><br/>강원도 평창군 진부면 라온아띠길 123</div>'
         });
-
-        window.naver.maps.Event.addListener(marker, 'click', () => {
-          if (infoWindow.getMap()) {
-            infoWindow.close();
-          } else {
-            infoWindow.open(map, marker);
-          }
+        (window as any).naver.maps.Event.addListener(marker, 'click', () => {
+          if (infoWindow.getMap()) infoWindow.close(); else infoWindow.open(map, marker);
         });
+      } catch (e) {
+        console.error('[NaverMap] init error', e);
       }
     };
+
+    // 네이버 지도 API 스크립트 로드 (공식 문서: ncpKeyId + callback)
+    const script = document.createElement('script');
+    script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=rsp6czfhye&callback=initNaverMap';
+    script.async = true;
+    script.defer = true;
+    script.setAttribute('data-naver-maps-loader', 'true');
+    script.onerror = () => {
+      console.error('[NaverMap] script load error');
+    };
+    console.log('[NaverMap] injecting script', { src: script.src, origin: window.location.origin, href: window.location.href });
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      // 콜백과 핸들러 정리 (스크립트는 유지해도 됨)
+      try {
+        (window as any).initNaverMap = undefined;
+        (window as any).navermap_authFailure = undefined;
+      } catch {}
     };
   }, []);
 
@@ -77,7 +108,6 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
           }}
         />
       </div>
-
       {/* Getting Here 섹션 */}
       <div style={{ padding: '0 20px 40px 20px', maxWidth: 800, margin: '0 auto' }}>
         <h2 style={{

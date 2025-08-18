@@ -14,6 +14,9 @@ declare global {
         };
       };
     };
+    // NAVER Map loader callback and auth failure handler
+    initNaverMap?: () => void;
+    navermap_authFailure?: () => void;
   }
 }
 
