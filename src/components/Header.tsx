@@ -36,8 +36,9 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick, isLoggedI
           alignItems: 'center',
           gap: 8
         }}>
-          <span>🏠</span>
-          라온아띠
+          <span>
+            <img src="public/images/logo.png" alt="라온아띠 로고" style={{ width: 150, height: 50 }} />
+          </span>
         </Link>
 
         {/* 네비게이션 */}

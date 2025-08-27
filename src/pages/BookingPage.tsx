@@ -10,7 +10,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80"
+          src="public/images/introduce.jpg"
           alt="라온아띠 펜션 실내"
           style={{
             width: '100%',
@@ -63,7 +63,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
             <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 8 }}>
               은행명
             </h3>
-            <p style={{ fontSize: 16, color: '#666' }}>신한은행</p>
+            <p style={{ fontSize: 16, color: '#666' }}>카카오뱅크</p>
           </div>
           
           <div>
@@ -129,7 +129,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 4 }}>
                 온라인
               </h3>
-              <p style={{ fontSize: 16, color: '#666' }}>웹사이트 방문</p>
+              <p style={{ fontSize: 16, color: '#666' }}>웹사이트 방문 | 여기어때 예약 | 네이버 예약</p>
             </div>
           </div>
         </div>
@@ -218,7 +218,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 4 }}>
                 체크인
               </h3>
-              <p style={{ fontSize: 16, color: '#666' }}>오후 2시</p>
+              <p style={{ fontSize: 16, color: '#666' }}>오후 3시</p>
             </div>
           </div>
           
@@ -238,7 +238,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 4 }}>
                 추가 인원 요금
               </h3>
-              <p style={{ fontSize: 16, color: '#666' }}>1박당 20,000원</p>
+              <p style={{ fontSize: 16, color: '#666' }}>1명당 20,000원</p>
             </div>
           </div>
         </div>

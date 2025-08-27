@@ -60,7 +60,6 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
       }
     };
 
-    // 네이버 지도 API 스크립트 로드 (공식 문서: ncpKeyId + callback)
     const script = document.createElement('script');
     script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=rsp6czfhye&callback=initNaverMap';
     script.async = true;
@@ -73,7 +72,6 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
     document.head.appendChild(script);
 
     return () => {
-      // 콜백과 핸들러 정리 (스크립트는 유지해도 됨)
       try {
         (window as any).initNaverMap = undefined;
         (window as any).navermap_authFailure = undefined;
@@ -86,7 +84,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80"
+          src="public/images/intro_img1.png"
           alt="라온아띠 펜션 외관"
           style={{
             width: '100%',
@@ -152,7 +150,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
               도로명 주소
             </h3>
             <p style={{ fontSize: 16, color: '#666', lineHeight: 1.5 }}>
-              강원도 평창군 진부면 라온아띠길 123
+              경기도 안산시 단원구 멍골2길 11-1
             </p>
           </div>
           
@@ -193,32 +191,6 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
               </p>
             </div>
           </div>
-          
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{ fontSize: 24, marginTop: 4 }}>🚌</div>
-            <div>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 8 }}>
-                대중교통 이용
-              </h3>
-              <p style={{ fontSize: 16, color: '#666', lineHeight: 1.6 }}>
-                평창역에서 진부면행 버스를 이용하시면 됩니다. 
-                진부면사무소 정류장에서 하차 후 도보 5분 거리입니다.
-              </p>
-            </div>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-            <div style={{ fontSize: 24, marginTop: 4 }}>🚶</div>
-            <div>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 8 }}>
-                도보
-              </h3>
-              <p style={{ fontSize: 16, color: '#666', lineHeight: 1.6 }}>
-                마을을 걸으며 신선한 공기와 지역의 매력을 느껴보세요. 
-                진부면사무소에서 도보로 약 5분 거리입니다.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -238,9 +210,8 @@ const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
           color: '#666',
           lineHeight: 1.6
         }}>
-          마을 입구 근처에 있는 "라온아띠" 간판을 찾으시면 됩니다. 
-          주요 랜드마크로는 진부면사무소와 근처 편의점이 있습니다. 
-          버스 정류장은 면사무소 바로 앞에 있습니다.
+          마을 입구 근처에 있는 "라온아띠" 간판을 찾으시면 됩니다. <br/>
+          근처 편의점은 없으니 들어오는 길에 마트에서 물품을 구입해 주세요.
         </p>
       </div>
 

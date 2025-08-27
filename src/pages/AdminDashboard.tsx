@@ -40,7 +40,6 @@ const AdminDashboard: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
-  // Block 관련 상태
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
   const [isBlockCancelModalOpen, setIsBlockCancelModalOpen] = useState(false);
@@ -48,14 +47,12 @@ const AdminDashboard: React.FC = () => {
   const [endDate, setEndDate] = useState('');
   const [blockReason, setBlockReason] = useState('');
 
-  // User 관련 상태
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isUserDetailModalOpen, setIsUserDetailModalOpen] = useState(false);
   const [userSearchTerm, setUserSearchTerm] = useState('');
 
   useEffect(() => {
-    // 로그인 상태 및 HOST 권한 확인
     const token = localStorage.getItem('jwt');
     if (!token || !isHost()) {
       navigate('/');
@@ -103,12 +100,12 @@ const AdminDashboard: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('jwt');
-    navigate('/');
+    window.location.href = '/';
   };
 
   const openDetailModal = async (bookingId: number) => {
     try {
-      const token = localStorage.getItem('jwt'); // 필요 시 토큰 가져오기
+      const token = localStorage.getItem('jwt'); 
       const res = await axios.get<Booking>(`http://13.125.18.129:8080/api/host/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
