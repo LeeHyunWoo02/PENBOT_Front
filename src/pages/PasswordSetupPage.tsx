@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const PasswordSetupPage: React.FC = () => {
@@ -7,6 +7,24 @@ const PasswordSetupPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [phone, setPhone] = useState('');
+
+  // 컴포넌트 마운트 시 휴대폰 번호 가져오기
+  useEffect(() => {
+    // URL 파라미터에서 phone 가져오기
+    const urlParams = new URLSearchParams(window.location.search);
+    const phoneFromUrl = urlParams.get('phone');
+    
+    if (phoneFromUrl) {
+      setPhone(phoneFromUrl);
+    } else {
+      // localStorage에서 phone 가져오기 (이전 페이지에서 저장했다면)
+      const savedPhone = localStorage.getItem('phone');
+      if (savedPhone) {
+        setPhone(savedPhone);
+      }
+    }
+  }, []);
 
   // 비밀번호 유효성 검사 함수
   const validatePassword = (pw: string) => {
@@ -18,6 +36,12 @@ const PasswordSetupPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    
+    if (!phone) {
+      setError('휴대폰 번호 정보가 없습니다. 다시 인증해주세요.');
+      return;
+    }
+    
     if (!validatePassword(password)) {
       setError('비밀번호는 8자 이상, 숫자, 대문자, 특수문자를 모두 포함해야 합니다.');
       return;
@@ -27,30 +51,44 @@ const PasswordSetupPage: React.FC = () => {
       return;
     }
     setIsSubmitting(true);
-    // TODO: 실제 비밀번호 저장 API 연동
-    try{
+    
+    try {
       const token = localStorage.getItem('jwt');
-      const res = await axios.post('http://13.125.18.129:8080/api/user/update', 
-        {password: password},
+      const response = await axios.post('http://13.125.18.129:8080/api/user/update', 
+        {
+          password: password,
+          phone: phone  // phone 필드 추가
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            // 만약 Content-Type 필요하면 아래도 추가:
             'Content-Type': 'application/json'
           }
       });
-      console.log(res);
+      
+      console.log('사용자 정보 업데이트 응답:', response.data);
 
-      if (res.data && res.data.accessToken) {
-        localStorage.setItem('jwt', res.data.accessToken);
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem('jwt', response.data.accessToken);
       }
+      
+      // 성공 시 localStorage에서 phone 제거 (보안상)
+      localStorage.removeItem('phone');
+      
       setSuccess('비밀번호가 성공적으로 설정되었습니다!');
-      window.location.href = '/';
-    } catch (error) {
-      console.error(error);
-      setError('비밀번호 설정에 실패했습니다.');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+    } catch (error: any) {
+      console.error('비밀번호 설정 오류:', error);
+      if (error.response) {
+        setError(error.response.data.message || '비밀번호 설정에 실패했습니다.');
+      } else {
+        setError('서버 오류로 비밀번호 설정에 실패했습니다.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   return (

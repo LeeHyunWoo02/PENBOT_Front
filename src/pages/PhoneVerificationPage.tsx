@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 추가: 페이지 이동을 위한 useNavigate
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const PhoneVerificationPage: React.FC = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phone, setPhone] = useState('');
-  const [isSending, setIsSending] = useState(false); // 인증번호 발송 중 상태 추가
-  const [sendMsg, setSendMsg] = useState(''); // 인증번호 발송 결과 메시지
-  const navigate = useNavigate(); // 추가: 페이지 이동 함수
+  const [isSending, setIsSending] = useState(false);
+  const [sendMsg, setSendMsg] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (index: number, value: string) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -28,7 +29,7 @@ const PhoneVerificationPage: React.FC = () => {
     setPhone(value);
   };
 
-  // 인증번호 발송 버튼 클릭 시 API 연동 (수정/추가)
+  // 인증번호 발송
   const handleSendCode = async () => {
     setSendMsg('');
     setError('');
@@ -38,85 +39,66 @@ const PhoneVerificationPage: React.FC = () => {
     }
     setIsSending(true);
     try {
-      const res = await fetch('http://13.125.18.129:8080/api/verify/sendcode', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
+      const response = await axios.post('http://13.125.18.129:8080/api/verify/sendcode', {
+        phone
       });
-      if (res.ok) {
-        setSendMsg('인증번호가 발송되었습니다.');
+      setSendMsg(response.data.message || '인증번호가 발송되었습니다.');
+    } catch (error: any) {
+      if (error.response) {
+        setError(error.response.data.message || '인증번호 발송에 실패했습니다.');
       } else {
-        setSendMsg('인증번호 발송에 실패했습니다.');
+        setError('서버 오류로 발송에 실패했습니다.');
       }
-    } catch (e) {
-      setSendMsg('서버 오류로 발송에 실패했습니다.');
+    } finally {
+      setIsSending(false);
     }
-    setIsSending(false);
   };
 
-    // 인증번호 검증
-    const verifyAuthCode = async () => {
-        setSendMsg('');
-        setError('');
-        setIsSending(true);
-        try {
-            const res = await fetch('http://13.125.18.129:8080/api/verify/verifycode', {
-                method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, code }),
-          });
-          const data = await res.json();
-          if (res.ok) {
-            setSendMsg(data.message || '인증번호 인증에 성공했습니다.');
-          } else {
-            setSendMsg(data.message || '인증번호가 옳지 않습니다.');
-          }
-        } catch (e) {
-          setSendMsg('서버 오류로 인증에 실패했습니다.');
-        } finally {
-          setIsSending(false);
-        }
-      };
-      
+  // 인증번호 검증 및 제출
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+    setSendMsg('');
 
-      const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setError('');
-        if (!/^01[016789][0-9]{7,8}$/.test(phone)) {
-          setError('올바른 휴대폰 번호를 입력하세요.');
-          setIsSubmitting(false);
-          return;
-        }
-        const codeValue = code.join('');
-        if (codeValue.length !== 6) {
-          setError('6자리 인증번호를 입력하세요.');
-          setIsSubmitting(false);
-          return;
-        }
-        try {
-          const res = await fetch('http://13.125.18.129:8080/api/verify/verifycode', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, code: code.join('') }),
-          });
-          console.log(res.body);
-          const data = await res.json();
-          console.log(data);
-          if (res.ok) {
-            setSendMsg(data.message || '인증번호 인증에 성공했습니다.');
-            // 인증 성공 시 비밀번호 설정 페이지로 이동
-            navigate('/password-setup'); // 추가: 인증 성공 시 이동
-          } else {
-            setError(data.message || '인증번호가 옳지 않습니다.');
-          }
-        } catch (e) {
-          setError('서버 오류로 인증에 실패했습니다.');
-        } finally {
-          setIsSubmitting(false);
-        }
-      };
+    // 휴대폰 번호 유효성 검사
+    if (!/^01[016789][0-9]{7,8}$/.test(phone)) {
+      setError('올바른 휴대폰 번호를 입력하세요.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // 인증번호 유효성 검사
+    const codeValue = code.join('');
+    if (codeValue.length !== 6) {
+      setError('6자리 인증번호를 입력하세요.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://13.125.18.129:8080/api/verify/verifycode', {
+        phone: phone,  // phone 필드 명시적으로 전달
+        code: codeValue
+      });
       
+      console.log('인증 응답:', response.data);
+      setSendMsg(response.data.message || '인증번호 인증에 성공했습니다.');
+      
+      // 인증 성공 시 휴대폰 번호를 localStorage에 저장하고 비밀번호 설정 페이지로 이동
+      localStorage.setItem('phone', phone);
+      navigate('/password-setup');
+    } catch (error: any) {
+      console.error('인증 오류:', error);
+      if (error.response) {
+        setError(error.response.data.message || '인증번호가 옳지 않습니다.');
+      } else {
+        setError('서버 오류로 인증에 실패했습니다.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div style={{ maxWidth: 480, margin: '60px auto', textAlign: 'center' }}>
@@ -189,7 +171,7 @@ const PhoneVerificationPage: React.FC = () => {
         {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}
         <button
           type="submit"
-          onClick={verifyAuthCode}
+          onClick={handleSubmit}
           disabled={isSubmitting}
           style={{
             width: '70%',
