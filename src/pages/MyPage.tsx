@@ -33,7 +33,6 @@ const MyPage: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(res.data);
         setUserInfo(res.data);
       } catch (error: any) {
         alert('사용자 정보 조회에 실패했습니다.');

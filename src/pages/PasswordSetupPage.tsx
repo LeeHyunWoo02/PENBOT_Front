@@ -66,8 +66,6 @@ const PasswordSetupPage: React.FC = () => {
           }
       });
       
-      console.log('사용자 정보 업데이트 응답:', response.data);
-
       if (response.data && response.data.accessToken) {
         localStorage.setItem('jwt', response.data.accessToken);
       }

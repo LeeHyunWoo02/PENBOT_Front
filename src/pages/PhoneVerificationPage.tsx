@@ -82,7 +82,6 @@ const PhoneVerificationPage: React.FC = () => {
         code: codeValue
       });
       
-      console.log('인증 응답:', response.data);
       setSendMsg(response.data.message || '인증번호 인증에 성공했습니다.');
       
       // 인증 성공 시 휴대폰 번호를 localStorage에 저장하고 비밀번호 설정 페이지로 이동

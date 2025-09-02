@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function decodeJwt(token) {
+function decodeJwt(token: string) {
   if (!token) return null;
   try {
     const payload = token.split('.')[1];
@@ -25,11 +25,8 @@ const OAuth2Redirect: React.FC = () => {
     if (accessToken) {
       localStorage.setItem('jwt', accessToken); // JWT 토큰 저장
       const payload = decodeJwt(accessToken);
-      console.log(payload);
-      console.log(payload?.role);
 
       if (payload?.role === "ROLE_TEMP") {
-        console.log("TEMP 유저는 인증 페이지로 이동합니다.");
         window.location.href = '/phone-verification';
         // navigate('/phone-verification');
       } else if (payload?.role === "ROLE_GUEST" || payload?.role === "ROLE_HOST") {

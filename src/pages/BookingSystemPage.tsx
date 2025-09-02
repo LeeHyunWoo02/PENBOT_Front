@@ -174,7 +174,6 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
       const res = await axios.get('http://13.125.18.129:8080/api/bookings/available',{
         params
       });
-      console.log(res.data);
       alert('예약이 가능합니다다!');
     
     } catch (error: any) {
