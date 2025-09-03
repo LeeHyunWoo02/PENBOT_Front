@@ -15,12 +15,14 @@ export const callGeminiAPI = async (text: string): Promise<ChatbotResponse> => {
     
     const response = await axios.post('http://15.164.225.221:8080/api/gemini/ask', 
       {
-        question: text
+        text
       },
       {
         headers: {
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        signal: controller.signal
       }
     );
 
