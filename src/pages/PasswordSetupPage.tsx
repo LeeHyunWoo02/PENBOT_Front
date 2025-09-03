@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const PasswordSetupPage: React.FC = () => {
@@ -70,7 +70,6 @@ const PasswordSetupPage: React.FC = () => {
         localStorage.setItem('jwt', response.data.accessToken);
       }
       
-      // 성공 시 localStorage에서 phone 제거 (보안상)
       localStorage.removeItem('phone');
       
       setSuccess('비밀번호가 성공적으로 설정되었습니다!');

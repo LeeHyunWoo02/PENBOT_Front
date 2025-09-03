@@ -13,7 +13,7 @@ interface ChatbotPageProps {
   onLoginClick: () => void;
 }
 
-const ChatbotPage: React.FC<ChatbotPageProps> = ({ onLoginClick }) => {
+const ChatbotPage: React.FC<ChatbotPageProps> = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

@@ -5,7 +5,7 @@ interface MainSectionProps {
   onChatbotClick?: () => void;
 }
 
-const MainSection: React.FC<MainSectionProps> = ({ onLoginClick, onChatbotClick }) => (
+const MainSection: React.FC<MainSectionProps> = ({ onLoginClick: _onLoginClick, onChatbotClick }) => (
   <main style={{ 
     textAlign: 'center', 
     padding: '40px 20px',

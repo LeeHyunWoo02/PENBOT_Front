@@ -17,19 +17,19 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
   
   // 이전 달의 마지막 날들
   const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
-  const prevMonthDays = [];
+  const prevMonthDays: Date[] = [];
   for (let i = firstDayOfMonth.getDay(); i > 0; i--) {
     prevMonthDays.push(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, prevMonthLastDay.getDate() - i + 1));
   }
   
   // 현재 달의 모든 날들
-  const currentMonthDays = [];
+  const currentMonthDays: Date[] = [];
   for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
     currentMonthDays.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), i));
   }
   
   // 다음 달의 첫 번째 날들
-  const nextMonthDays = [];
+  const nextMonthDays: Date[] = [];
   const remainingDays = 42 - (prevMonthDays.length + currentMonthDays.length); // 6주 고정
   for (let i = 1; i <= remainingDays; i++) {
     nextMonthDays.push(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i));
@@ -83,18 +83,6 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
 
   const isCurrentMonth = (date: Date) => {
     return date.getMonth() === currentDate.getMonth();
-  };
-
-  const isSelected = (date: Date) => {
-    if (!selectedStartDate) return false;
-    
-    if (selectedEndDate) {
-      // 범위 선택된 경우
-      return date >= selectedStartDate && date <= selectedEndDate;
-    } else {
-      // 시작 날짜만 선택된 경우
-      return date.getTime() === selectedStartDate.getTime();
-    }
   };
 
   const isStartDate = (date: Date) => {
@@ -171,7 +159,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
     };
   
     try {
-      const res = await axios.get('http://13.125.18.129:8080/api/bookings/available',{
+      await axios.get('http://13.125.18.129:8080/api/bookings/available',{
         params
       });
       alert('예약이 가능합니다다!');
@@ -215,7 +203,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
         onLoginClick(); 
         return;
       }
-      const res = await axios.post('http://13.125.18.129:8080/api/bookings/', body, {
+      await axios.post('http://13.125.18.129:8080/api/bookings/', body, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('예약이 완료되었습니다!');

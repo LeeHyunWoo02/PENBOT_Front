@@ -24,12 +24,10 @@ const PhoneVerificationPage: React.FC = () => {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers, max 11 digits (010xxxxxxxx)
     const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
     setPhone(value);
   };
 
-  // 인증번호 발송
   const handleSendCode = async () => {
     setSendMsg('');
     setError('');
@@ -54,21 +52,17 @@ const PhoneVerificationPage: React.FC = () => {
     }
   };
 
-  // 인증번호 검증 및 제출
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
     setSendMsg('');
 
-    // 휴대폰 번호 유효성 검사
     if (!/^01[016789][0-9]{7,8}$/.test(phone)) {
       setError('올바른 휴대폰 번호를 입력하세요.');
       setIsSubmitting(false);
       return;
     }
-
-    // 인증번호 유효성 검사
     const codeValue = code.join('');
     if (codeValue.length !== 6) {
       setError('6자리 인증번호를 입력하세요.');
@@ -78,13 +72,12 @@ const PhoneVerificationPage: React.FC = () => {
 
     try {
       const response = await axios.post('http://13.125.18.129:8080/api/verify/verifycode', {
-        phone: phone,  // phone 필드 명시적으로 전달
+        phone: phone,  
         code: codeValue
       });
       
       setSendMsg(response.data.message || '인증번호 인증에 성공했습니다.');
       
-      // 인증 성공 시 휴대폰 번호를 localStorage에 저장하고 비밀번호 설정 페이지로 이동
       localStorage.setItem('phone', phone);
       navigate('/password-setup');
     } catch (error: any) {

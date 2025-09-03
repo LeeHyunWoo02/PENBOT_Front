@@ -8,7 +8,7 @@ interface HeaderProps {
   isLoggedIn?: boolean; // 추가
 }
 
-const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick, isLoggedIn }) => {
+const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick: _onChatbotClick, isLoggedIn }) => {
   return (
     <header style={{
       backgroundColor: '#1a1a1a',

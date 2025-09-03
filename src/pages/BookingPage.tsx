@@ -4,7 +4,7 @@ interface BookingPageProps {
   onLoginClick: () => void;
 }
 
-const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick }) => {
+const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }) => {
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
       {/* 메인 이미지 섹션 */}

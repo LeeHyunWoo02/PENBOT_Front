@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
@@ -17,16 +17,13 @@ import './App.css';
 
 function App() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-  const [redirectPath, setRedirectPath] = useState<string | null>(null); // 리다이렉트 경로 저장
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 앱 로드 시 localStorage에 jwt 토큰이 있으면 로그인 상태로 설정 (수정/추가)
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     setIsLoggedIn(!!token);
   }, []);
 
-  // 소셜 로그인 후 토큰이 저장되면 로그인 상태 갱신 (수정/추가)
   useEffect(() => {
     const onStorage = () => {
       const token = localStorage.getItem('jwt');
@@ -42,18 +39,14 @@ function App() {
 
   const handleChatbotClick = () => {
     if (isLoggedIn) {
-      // 로그인된 상태면 챗봇으로 이동
       window.location.href = '/chatbot';
     } else {
-      // 로그인되지 않은 상태면 로그인 모달 열기
-      setRedirectPath('/chatbot');
       setIsLoginModalOpen(true);
     }
   };
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
-    setRedirectPath(null);
   };
 
   const handleLoginSuccess = () => {

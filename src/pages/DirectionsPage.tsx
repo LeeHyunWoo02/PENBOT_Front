@@ -4,7 +4,7 @@ interface DirectionsPageProps {
   onLoginClick: () => void;
 }
 
-const DirectionsPage: React.FC<DirectionsPageProps> = ({ onLoginClick }) => {
+const DirectionsPage: React.FC<DirectionsPageProps> = () => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 

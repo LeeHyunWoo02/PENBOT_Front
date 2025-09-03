@@ -6,7 +6,7 @@ interface LoginModalProps {
   onLoginSuccess?: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const handleLogin =  (provider: string) => {
     // 실제 로그인 로직은 여기에 구현
     console.log(`${provider}로 로그인 시도`);
@@ -121,7 +121,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
             카카오로 계속하기
           </button>
 
-          {/* 네이버 로그인 버튼 */}
+          {/* 네이버 로그인 버튼
           <button 
             onClick={() => handleLogin('naver')}
             style={{
@@ -141,28 +141,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLoginSuccess
           >
             <span style={{ fontSize: 18 }}>🟢</span>
             네이버로 계속하기
-          </button>
-
-          <button 
-            onClick={() => handleLogin('google')}
-            style={{
-              background: '#4285F4',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 8,
-              padding: '12px 20px',
-              fontWeight: 500,
-              fontSize: 16,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8
-            }}
-          >
-            <span style={{ fontSize: 18 }}>🔍</span>
-            구글로 계속하기
-          </button>
+          </button> */}
         </div>
 
         {/* 고객 지원 링크 */}
