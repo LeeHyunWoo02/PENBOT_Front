@@ -84,7 +84,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="public/images/intro_img1.png"
+          src="/images/intro_img1.png"
           alt="라온아띠 펜션 외관"
           style={{
             width: '100%',

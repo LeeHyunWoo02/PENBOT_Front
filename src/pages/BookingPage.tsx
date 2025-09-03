@@ -10,7 +10,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="public/images/introduce.jpg"
+          src="/images/introduce.jpg"
           alt="라온아띠 펜션 실내"
           style={{
             width: '100%',

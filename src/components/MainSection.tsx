@@ -12,7 +12,7 @@ const MainSection: React.FC<MainSectionProps> = ({ onLoginClick: _onLoginClick, 
     backgroundColor: '#fff'
   }}>
     <img
-      src="public/images/intro_img1.png"
+      src="/images/intro_img1.png"
       alt="라온아띠 펜션"
       style={{ 
         width: '100%', 

@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onLoginClick, onChatbotClick: _onChatbo
           gap: 8
         }}>
           <span>
-            <img src="public/images/logo.png" alt="라온아띠 로고" style={{ width: 150, height: 50 }} />
+            <img src="/images/logo.png" alt="라온아띠 로고" style={{ width: 150, height: 50 }} />
           </span>
         </Link>
 
