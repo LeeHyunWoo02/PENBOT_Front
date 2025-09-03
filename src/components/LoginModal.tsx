@@ -11,7 +11,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     // 실제 로그인 로직은 여기에 구현
     console.log(`${provider}로 로그인 시도`);
 
-     window.location.href = `http://13.125.18.129:8080/oauth2/authorization/${provider}`
+     window.location.href = `http://15.164.225.221:8080/oauth2/authorization/${provider}`
 
 
   };

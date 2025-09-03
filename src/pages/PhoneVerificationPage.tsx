@@ -37,7 +37,7 @@ const PhoneVerificationPage: React.FC = () => {
     }
     setIsSending(true);
     try {
-      const response = await axios.post('http://13.125.18.129:8080/api/verify/sendcode', {
+      const response = await axios.post('http://15.164.225.221:8080/api/verify/sendcode', {
         phone
       });
       setSendMsg(response.data.message || '인증번호가 발송되었습니다.');
@@ -71,13 +71,15 @@ const PhoneVerificationPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://13.125.18.129:8080/api/verify/verifycode', {
+      const response = await axios.post('http://15.164.225.221:8080/api/verify/verifycode', {
         phone: phone,  
         code: codeValue
       });
       
+      console.log('인증 응답:', response.data);
       setSendMsg(response.data.message || '인증번호 인증에 성공했습니다.');
       
+      // 인증 성공 시 휴대폰 번호를 localStorage에 저장하고 비밀번호 설정 페이지로 이동
       localStorage.setItem('phone', phone);
       navigate('/password-setup');
     } catch (error: any) {

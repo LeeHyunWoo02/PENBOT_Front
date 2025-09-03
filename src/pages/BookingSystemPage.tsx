@@ -159,7 +159,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
     };
   
     try {
-      await axios.get('http://13.125.18.129:8080/api/bookings/available',{
+      await axios.get('http://15.164.225.221:8080/api/bookings/available',{
         params
       });
       alert('예약이 가능합니다다!');
@@ -203,7 +203,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
         onLoginClick(); 
         return;
       }
-      await axios.post('http://13.125.18.129:8080/api/bookings/', body, {
+      await axios.post('http://15.164.225.221:8080/api/bookings/', body, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('예약이 완료되었습니다!');
