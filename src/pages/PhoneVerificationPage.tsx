@@ -37,7 +37,7 @@ const PhoneVerificationPage: React.FC = () => {
     }
     setIsSending(true);
     try {
-      const response = await axios.post('http://15.164.225.221:8080/api/verify/sendcode', {
+      const response = await axios.post('https://www.penbot.site/api/verify/sendcode', {
         phone
       });
       setSendMsg(response.data.message || '인증번호가 발송되었습니다.');
@@ -71,7 +71,7 @@ const PhoneVerificationPage: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://15.164.225.221:8080/api/verify/verifycode', {
+      const response = await axios.post('https://www.penbot.site/api/verify/verifycode', {
         phone: phone,  
         code: codeValue
       });

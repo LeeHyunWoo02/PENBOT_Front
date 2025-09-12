@@ -28,7 +28,7 @@ const MyPage: React.FC = () => {
     // 사용자 정보 불러오기
     const fetchUserInfo = async () => {
       try {
-        const res = await axios.get('http://15.164.225.221:8080/api/user/search', {
+        const res = await axios.get('https://www.penbot.site/api/user/search', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -54,7 +54,7 @@ const PasswordSetupPage: React.FC = () => {
     
     try {
       const token = localStorage.getItem('jwt');
-      const response = await axios.post('http://15.164.225.221:8080/api/user/update', 
+      const response = await axios.post('https://www.penbot.site/api/user/update', 
         {
           password: password,
           phone: phone  // phone 필드 추가
