@@ -61,7 +61,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
     };
 
     const script = document.createElement('script');
-    script.src = 'https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=rsp6czfhye&callback=initNaverMap';
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${import.meta.env.VITE_NAVER_MAPS_API_KEY}&callback=initNaverMap`;
     script.async = true;
     script.defer = true;
     script.setAttribute('data-naver-maps-loader', 'true');

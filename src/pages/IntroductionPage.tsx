@@ -10,7 +10,7 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick }) => 
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="public/images/view.jpg"
+          src="/images/view.jpg"
           alt="라온아띠 펜션 외관"
           style={{
             width: '100%',
