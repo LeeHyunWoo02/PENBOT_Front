@@ -10,13 +10,21 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
 
     // 중복 로드 방지
     const existing = document.querySelector('script[data-naver-maps-loader="true"]') as HTMLScriptElement | null;
-    if (existing && (window as any).naver && (window as any).naver.maps) {
-      console.log('[NaverMap] script already loaded, initializing map');
-      (window as any).initNaverMap?.();
+    if (existing) {
+      console.log('[NaverMap] script already loaded');
+      // 이미 스크립트가 로드되어 있다면 폴링으로 naver.maps 확인
+      const checkNaverMaps = () => {
+        if ((window as any).naver?.maps) {
+          initializeMap();
+        } else {
+          setTimeout(checkNaverMaps, 100);
+        }
+      };
+      checkNaverMaps();
       return;
     }
 
-    // 인증 실패 핸들러 (공식 문서 권장 네이밍)
+    // 인증 실패 핸들러
     (window as any).navermap_authFailure = function () {
       console.error('[NaverMap] OPENAPI 인증 실패', {
         origin: window.location.origin,
@@ -25,12 +33,12 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       alert('네이버 지도 인증에 실패했습니다. 콘솔 로그를 확인하세요.');
     };
 
-    // 콜백에서 지도 초기화
-    (window as any).initNaverMap = function () {
+    // 지도 초기화 함수
+    const initializeMap = () => {
       try {
-        console.log('[NaverMap] initNaverMap callback fired');
-        if (!(window as any).naver || !(window as any).naver.maps) {
-          console.error('[NaverMap] naver.maps not available after load');
+        console.log('[NaverMap] initializing map');
+        if (!(window as any).naver?.maps) {
+          console.error('[NaverMap] naver.maps not available');
           return;
         }
         const mapContainer = document.getElementById('map');
@@ -60,8 +68,21 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       }
     };
 
+    // 콜백 함수 - 스크립트 로드 완료 후 폴링으로 안전하게 초기화
+    (window as any).initNaverMap = function () {
+      console.log('[NaverMap] script loaded, checking naver.maps availability');
+      const checkNaverMaps = () => {
+        if ((window as any).naver?.maps) {
+          initializeMap();
+        } else {
+          setTimeout(checkNaverMaps, 50); // 50ms 간격으로 체크
+        }
+      };
+      checkNaverMaps();
+    };
+
     const script = document.createElement('script');
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${import.meta.env.VITE_NAVER_MAPS_API_KEY}&callback=initNaverMap`;
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${import.meta.env.VITE_NAVER_MAPS_API_KEY}&callback=initNaverMap`;
     script.async = true;
     script.defer = true;
     script.setAttribute('data-naver-maps-loader', 'true');
