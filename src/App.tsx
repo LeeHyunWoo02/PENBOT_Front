@@ -60,7 +60,7 @@ function App() {
       <Layout onLoginClick={handleLoginClick} onChatbotClick={handleChatbotClick} isLoggedIn={isLoggedIn}>
         <Routes>
           <Route path="/" element={<HomePage onLoginClick={handleLoginClick} onChatbotClick={handleChatbotClick} />} />
-          <Route path="/introduction" element={<IntroductionPage onLoginClick={handleLoginClick} />} />
+          <Route path="/introduction" element={<IntroductionPage onLoginClick={handleLoginClick} isLoggedIn={isLoggedIn} />} />
           <Route path="/booking" element={<BookingPage onLoginClick={handleLoginClick} />} />
           <Route path="/directions" element={<DirectionsPage onLoginClick={handleLoginClick} />} />
           <Route path="/booking-system" element={<BookingSystemPage onLoginClick={handleLoginClick} />} />

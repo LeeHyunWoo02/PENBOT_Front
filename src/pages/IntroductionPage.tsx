@@ -2,15 +2,16 @@ import React from 'react';
 
 interface IntroductionPageProps {
   onLoginClick: () => void;
+  isLoggedIn?: boolean;
 }
 
-const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick }) => {
+const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick, isLoggedIn }) => {
   return (
     <div style={{ backgroundColor: '#fff', minHeight: '100vh' }}>
       {/* 메인 이미지 섹션 */}
       <div style={{ width: '100%', marginBottom: 40 }}>
         <img
-          src="/images/view.jpg"
+          src="/images/iinntrod.jpg"
           alt="라온아띠 펜션 외관"
           style={{
             width: '100%',
@@ -291,7 +292,15 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick }) => 
           경쟁력 있는 요금과 유연한 예약 옵션을 제공합니다.
         </p>
         <button 
-          onClick={onLoginClick}
+          onClick={() => {
+            if (isLoggedIn) {
+              // 로그인된 상태면 예약 시스템으로 이동
+              window.location.href = '/booking-system';
+            } else {
+              // 로그인되지 않은 상태면 로그인 모달 열기
+              onLoginClick();
+            }
+          }}
           style={{
             background: '#2196f3',
             color: '#fff',
