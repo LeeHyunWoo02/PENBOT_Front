@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { isTokenExpired } from '../utils/jwtUtils';
 
 interface UserInfo {
   name: string;
@@ -31,7 +32,9 @@ const MyPage: React.FC = () => {
   useEffect(() => {
     // 로그인 상태 확인
     const token = localStorage.getItem('jwt');
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('jwt');
+      alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
       navigate('/');
       return;
     }
@@ -46,8 +49,15 @@ const MyPage: React.FC = () => {
         });
         setUserInfo(res.data);
       } catch (error: any) {
-        alert('사용자 정보 조회에 실패했습니다.');
-        navigate('/');
+        if (error.response?.status === 401) {
+          // 401 Unauthorized - 토큰 만료
+          localStorage.removeItem('jwt');
+          alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+          navigate('/');
+        } else {
+          alert('사용자 정보 조회에 실패했습니다.');
+          navigate('/');
+        }
       }
     };
     fetchUserInfo();
