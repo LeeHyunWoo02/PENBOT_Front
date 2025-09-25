@@ -57,6 +57,27 @@ export const getTimeUntilExpiry = (token: string): number => {
 };
 
 /**
+ * 현재 사용자가 호스트(관리자)인지 확인합니다.
+ * @param tokenKey localStorage의 토큰 키 (기본값: 'jwt')
+ * @returns 호스트 여부
+ */
+export const isHost = (tokenKey: string = 'jwt'): boolean => {
+  const token = localStorage.getItem(tokenKey);
+  if (!token || isTokenExpired(token)) {
+    return false;
+  }
+
+  const payload = decodeJWT(token);
+  if (!payload) {
+    return false;
+  }
+
+  // JWT 페이로드에서 role 또는 권한 정보 확인
+  // 서버에서 'role': 'HOST' 또는 'isHost': true 등을 설정한다고 가정
+  return payload.role === 'HOST' || payload.isHost === true || payload.authorities?.includes('HOST');
+};
+
+/**
  * localStorage에서 만료된 JWT 토큰을 자동으로 제거합니다.
  * @param tokenKey localStorage의 토큰 키 (기본값: 'jwt')
  */
