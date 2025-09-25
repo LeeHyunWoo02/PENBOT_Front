@@ -82,14 +82,35 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
     };
 
     const script = document.createElement('script');
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${import.meta.env.VITE_NAVER_MAPS_API_KEY}&callback=initNaverMap`;
+    const apiKey = import.meta.env.VITE_NAVER_MAPS_API_KEY || 'rsp6czfhye'; // 임시 fallback
+    
+    // API 키 디버깅
+    console.log('[NaverMap] API Key check:', {
+      apiKey: apiKey ? `${apiKey.substring(0, 8)}...` : 'NOT_FOUND',
+      apiKeyLength: apiKey ? apiKey.length : 0,
+      environment: import.meta.env.MODE,
+      origin: window.location.origin,
+      href: window.location.href
+    });
+    
+    if (!apiKey) {
+      console.error('[NaverMap] VITE_NAVER_MAPS_API_KEY 환경 변수가 설정되지 않았습니다.');
+      alert('네이버 지도 API 키가 설정되지 않았습니다. 관리자에게 문의하세요.');
+      return;
+    }
+    
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${apiKey}&callback=initNaverMap`;
     script.async = true;
     script.defer = true;
     script.setAttribute('data-naver-maps-loader', 'true');
     script.onerror = () => {
       console.error('[NaverMap] script load error');
     };
-    console.log('[NaverMap] injecting script', { src: script.src, origin: window.location.origin, href: window.location.href });
+    console.log('[NaverMap] injecting script', { 
+      src: script.src.replace(apiKey, `${apiKey.substring(0, 8)}...`), 
+      origin: window.location.origin, 
+      href: window.location.href 
+    });
     document.head.appendChild(script);
 
     return () => {
