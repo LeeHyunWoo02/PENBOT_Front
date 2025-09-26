@@ -1,4 +1,3 @@
-// JWT 토큰 유틸리티 함수들
 
 /**
  * JWT 토큰을 디코딩하여 페이로드를 반환합니다.
@@ -7,13 +6,11 @@
  */
 export const decodeJWT = (token: string): any | null => {
   try {
-    // JWT 토큰은 header.payload.signature 형식
     const parts = token.split('.');
     if (parts.length !== 3) {
       return null;
     }
 
-    // payload 부분을 디코딩 (Base64)
     const payload = parts[1];
     const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
     return JSON.parse(decodedPayload);
@@ -31,10 +28,9 @@ export const decodeJWT = (token: string): any | null => {
 export const isTokenExpired = (token: string): boolean => {
   const payload = decodeJWT(token);
   if (!payload || !payload.exp) {
-    return true; // 페이로드가 없거나 exp가 없으면 만료된 것으로 간주
+    return true; 
   }
 
-  // exp는 Unix timestamp (초 단위)
   const currentTime = Math.floor(Date.now() / 1000);
   return payload.exp < currentTime;
 };
@@ -72,9 +68,29 @@ export const isHost = (tokenKey: string = 'jwt'): boolean => {
     return false;
   }
 
-  // JWT 페이로드에서 role 또는 권한 정보 확인
-  // 서버에서 'role': 'HOST' 또는 'isHost': true 등을 설정한다고 가정
-  return payload.role === 'HOST' || payload.isHost === true || payload.authorities?.includes('HOST');
+  // 수집 가능한 권한/역할 필드들 추출
+  const candidates: any[] = [];
+  if (payload.role) candidates.push(payload.role);
+  if (payload.roles) candidates.push(payload.roles);
+  if (payload.authorities) candidates.push(payload.authorities);
+  if (payload.authority) candidates.push(payload.authority);
+  if (payload.permissions) candidates.push(payload.permissions);
+
+  // 문자열/배열 모두 대문자 문자열 배열로 정규화
+  const flatRoles: string[] = candidates
+    .flatMap((v) => Array.isArray(v) ? v : [v])
+    .filter((v) => typeof v === 'string')
+    .map((v: string) => v.toUpperCase());
+
+  // 포함 규칙: 'HOST' 또는 'ROLE_HOST' 등이 하나라도 포함
+  if (flatRoles.some((r) => r === 'HOST' || r === 'ROLE_HOST' || r.includes('HOST'))) {
+    return true;
+  }
+
+  // 백업: 서버가 boolean 플래그 제공 시
+  if (payload.isHost === true) return true;
+
+  return false;
 };
 
 /**
@@ -104,22 +120,19 @@ export const startTokenExpiryMonitor = (
     return null;
   }
 
-  // 이미 만료된 토큰이면 즉시 제거
   if (isTokenExpired(token)) {
     localStorage.removeItem(tokenKey);
     onTokenExpired?.();
     return null;
   }
 
-  // 만료까지 남은 시간 계산
   const timeUntilExpiry = getTimeUntilExpiry(token);
   if (timeUntilExpiry <= 0) {
     localStorage.removeItem(tokenKey);
     onTokenExpired?.();
     return null;
   }
-
-  // 만료 시간에 맞춰 타이머 설정
+  
   const timer = setTimeout(() => {
     localStorage.removeItem(tokenKey);
     console.log('JWT 토큰이 만료되어 localStorage에서 제거되었습니다.');

@@ -233,7 +233,7 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick, isLog
             }}>
               📺
             </div>
-            <p style={{ fontSize: 16, color: '#666' }}>스마트 TV와 노래방방</p>
+            <p style={{ fontSize: 16, color: '#666' }}>스마트 TV와 노래방</p>
           </div>
           
           <div style={{ textAlign: 'center', padding: 20 }}>
@@ -288,16 +288,14 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick, isLog
           lineHeight: 1.6,
           marginBottom: 30
         }}>
-          예약 캘린더에서 가용성과 가격을 확인하세요. 
+          예약 캘린더에서 예약 가능한지와 가격을 확인하세요. 
           경쟁력 있는 요금과 유연한 예약 옵션을 제공합니다.
         </p>
         <button 
           onClick={() => {
             if (isLoggedIn) {
-              // 로그인된 상태면 예약 시스템으로 이동
               window.location.href = '/booking-system';
             } else {
-              // 로그인되지 않은 상태면 로그인 모달 열기
               onLoginClick();
             }
           }}
@@ -331,8 +329,8 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick, isLog
           color: '#666',
           lineHeight: 1.6
         }}>
-          대부도도에 위치한 라온아띠 키즈 펜션입니다. 
-          문의사항은 [전화번호] 또는 [이메일]로 연락해 주세요.
+          대부도도에 위치한 라온아띠 키즈 펜션입니다.
+          문의사항은 [010-2661-7200] 또는 [카카오톡 플러스 친구]로 연락해 주세요.
         </p>
       </div>
 
@@ -348,16 +346,34 @@ const IntroductionPage: React.FC<IntroductionPageProps> = ({ onLoginClick, isLog
         </h2>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 30 }}>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>📷</div>
-            <p style={{ fontSize: 16, color: '#666' }}>인스타그램</p>
+            <a
+              href="https://www.instagram.com/laonatti_kids?igsh=MWxoMzMxNG1jNHo4bQ=="
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none' }}
+            >
+              <img
+                src="https://www.instagram.com/static/images/ico/favicon-200.png/ab6eff595bb1.png"
+                alt="Instagram"
+                style={{ width: 40, height: 40, marginBottom: 8, borderRadius: 8 }}
+              />
+              <span style={{ fontSize: 16, color: '#666' }}>인스타그램</span>
+            </a>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>ⓕ</div>
-            <p style={{ fontSize: 16, color: '#666' }}>페이스북</p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>🐦</div>
-            <p style={{ fontSize: 16, color: '#666' }}>트위터</p>
+            <a
+              href="http://pf.kakao.com/_NxexlBxj"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', textDecoration: 'none' }}
+            >
+              <img
+                src="https://developers.kakao.com/favicon.ico"
+                alt="KakaoTalk Plus Friend"
+                style={{ width: 40, height: 40, marginBottom: 8, borderRadius: 8 }}
+              />
+              <span style={{ fontSize: 16, color: '#666' }}>카카오톡 플러스친구</span>
+            </a>
           </div>
         </div>
       </div>

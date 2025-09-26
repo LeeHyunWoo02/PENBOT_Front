@@ -15,10 +15,10 @@ interface Booking {
 
 interface BlockedDate {
   blockedDateId: number;
-  startDate: string;                   // "2025-08-27"
-  endDate: string;                     // "2025-08-28"
-  reason: string;                      // "테스트"
-  type: 'BLOCKED' | 'BOOKED' | string; // 서버가 주는 값
+  startDate: string;               
+  endDate: string;                  
+  reason: string;                      
+  type: 'BLOCKED' | 'BOOKED' | string; 
 }
 
 interface User {
@@ -121,7 +121,6 @@ const AdminDashboard: React.FC = () => {
     setIsDetailModalOpen(false);
   };
 
-  // Block 관련 함수들
   const openBlockModal = () => {
     setStartDate('');
     setEndDate('');
@@ -168,7 +167,6 @@ const AdminDashboard: React.FC = () => {
       alert('날짜가 성공적으로 차단되었습니다.');
       closeBlockModal();
   
-      // 차단 목록 새로고침
       const res = await axios.get('https://www.penbot.site/api/host/blocks', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -189,7 +187,6 @@ const AdminDashboard: React.FC = () => {
       
       alert('차단이 성공적으로 해제되었습니다.');
       
-      // 차단된 날짜 목록 새로고침
       const res = await axios.get('https://www.penbot.site/api/host/blocks', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -200,7 +197,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // User 관련 함수들
 
   const openUserDetailModal = async (userId: number) => {
     try {
@@ -235,7 +231,6 @@ const AdminDashboard: React.FC = () => {
       alert('유저가 성공적으로 삭제되었습니다.');
       closeUserDetailModal();
       
-      // 유저 목록 새로고침
       const res = await axios.get('https://www.penbot.site/api/host/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -246,7 +241,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  // 예약 상태 변경 함수 추가
   const handleUpdateBookingStatus = async (bookingId: number, newStatus: 'CONFIRMED' | 'CANCELLED') => {
     if (!window.confirm(`예약 상태를 ${newStatus === 'CONFIRMED' ? '확정' : '취소'}하시겠습니까?`)) {
       return;
@@ -262,13 +256,11 @@ const AdminDashboard: React.FC = () => {
       
       alert(`예약 상태가 성공적으로 ${newStatus === 'CONFIRMED' ? '확정' : '취소'}되었습니다.`);
       
-      // 예약 목록 새로고침
       const res = await axios.get('https://www.penbot.site/api/host/bookings', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(res.data);
       
-      // 모달 닫기
       closeDetailModal();
     } catch (error: any) {
       const status = error?.response?.status;

@@ -35,16 +35,13 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       }
     };
 
-    // 1) SDK 이미 로드되어 있고 maps 사용 가능 → 즉시 초기화
     if ((window as any).kakao?.maps) {
       (window as any).kakao.maps.load(initializeKakaoMap);
       return;
     }
 
-    // 2) 이미 SDK 스크립트가 존재하는지 (src 기반) 확인 → 로드 완료/대기 처리
     const existing = document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]') as HTMLScriptElement | null;
     if (existing) {
-      console.log('[KakaoMap] script already present');
       const tryLoad = () => {
         if ((window as any).kakao?.maps?.load) {
           (window as any).kakao.maps.load(initializeKakaoMap);
@@ -63,7 +60,6 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       return;
     }
 
-    // 3) 처음 로드: 환경 변수 키 확인 후 주입
     const kakaoKey = import.meta.env.VITE_KAKAOMAP_KEY as string | undefined;
     if (!kakaoKey) {
       console.error('[KakaoMap] VITE_KAKAOMAP_KEY is not set');
@@ -110,7 +106,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
         <h2 style={{ fontSize: 28, fontWeight: 600, color: '#000', marginBottom: 20, textAlign: 'left' }}>찾아오는 길</h2>
         <p style={{ fontSize: 18, color: '#666', lineHeight: 1.6, marginBottom: 30 }}>
           라온아띠 키즈 펜션은 대부도에 위치해 있으며, 
-          대부도 초입에서 차로 약 20분 거리에 있습니다.
+          대부도 초입에서 차로 약 30분 거리에 있습니다.
         </p>
       </div>
       <div style={{ padding: '0 20px 40px 20px', maxWidth: 800, margin: '0 auto' }}>
@@ -152,9 +148,63 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
       <div style={{ padding: '0 20px 40px 20px', maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
         <h2 style={{ fontSize: 28, fontWeight: 600, color: '#000', marginBottom: 20 }}>지도 앱으로 길찾기</h2>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
-          <button onClick={() => window.open('https://map.kakao.com', '_blank')} style={{ background: '#FEE500', color: '#000', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: 16, cursor: 'pointer' }}>🗺️ 카카오맵</button>
-          <button onClick={() => window.open('https://maps.google.com', '_blank')} style={{ background: '#4285F4', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: 16, cursor: 'pointer' }}>🗺️ 구글맵</button>
-          <button onClick={() => window.open('https://www.tmap.co.kr', '_blank')} style={{ background: '#FF6B35', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 24px', fontWeight: 500, fontSize: 16, cursor: 'pointer' }}>🗺️ 티맵</button>
+          <button
+            onClick={() => window.open('https://map.kakao.com', '_blank')}
+            style={{
+              background: '#FEE500',
+              color: '#000',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 500,
+              fontSize: 16,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+          >
+            <img src="https://map.kakao.com/favicon.ico" alt="카카오맵" style={{ width: 18, height: 18, borderRadius: 4 }} />
+            카카오맵
+          </button>
+          <button
+            onClick={() => window.open('https://maps.google.com', '_blank')}
+            style={{
+              background: '#4285F4',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 500,
+              fontSize: 16,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+          >
+            <img src="https://maps.google.com/favicon.ico" alt="구글맵" style={{ width: 18, height: 18, borderRadius: 4 }} />
+            구글맵
+          </button>
+          <button
+            onClick={() => window.open('https://map.naver.com', '_blank')}
+            style={{
+              background: '#03C75A',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '12px 24px',
+              fontWeight: 500,
+              fontSize: 16,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+          >
+            <img src="https://map.naver.com/favicon.ico" alt="네이버 지도" style={{ width: 18, height: 18, borderRadius: 4 }} />
+            네이버 지도
+          </button>
         </div>
         <p style={{ fontSize: 16, color: '#666', lineHeight: 1.6 }}>상세한 길안내를 원하시면 위의 지도 앱을 이용해 주세요.</p>
       </div>
@@ -162,7 +212,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 800, margin: '0 auto', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <p style={{ fontSize: 16, color: '#666', marginBottom: 8 }}>위치: 경기도 안산시 단원구 멍골2길 11</p>
-            <p style={{ fontSize: 16, color: '#666' }}>연락처: (010) 1234-5678</p>
+            <p style={{ fontSize: 16, color: '#666' }}>연락처: (010) 5656-3642</p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 8 }}>

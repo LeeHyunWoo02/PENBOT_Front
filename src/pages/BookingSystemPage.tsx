@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface BookingSystemPageProps {
   onLoginClick: () => void;
@@ -10,6 +10,66 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
   const [selectedEndDate, setSelectedEndDate] = useState<Date | null>(null);
   const [guestCount, setGuestCount] = useState('');
+  const [bookedDateSet, setBookedDateSet] = useState<Set<string>>(new Set());
+
+  // 가격 정책: 월~목 55만원, 금/토 100만원, 일 70만원
+  const getPriceForDate = (date: Date): number => {
+    const day = date.getDay(); // 0: 일, 1: 월, ... 6: 토
+    if (day === 0) return 700000; // 일
+    if (day === 5 || day === 6) return 1000000; // 금/토
+    return 550000; // 월~목
+  };
+
+  const formatPriceShort = (price: number): string => {
+    const unit = Math.round(price / 10000);
+    return `${unit}만원`;
+  };
+
+  // YYYY-MM-DD
+  const toDateString = (d: Date): string => d.toISOString().slice(0, 10);
+
+  // 주어진 구간의 모든 날짜 문자열 생성 (end는 체크아웃 날짜로, 전날까지 차단)
+  const enumerateDates = (start: string, end: string): string[] => {
+    const dates: string[] = [];
+    const s = new Date(start);
+    const e = new Date(end);
+    // 체크아웃 당일은 숙박하지 않으므로 전날까지 포함
+    const last = new Date(e);
+    last.setDate(last.getDate() - 1);
+    for (let d = new Date(s); d <= last; d.setDate(d.getDate() + 1)) {
+      dates.push(toDateString(new Date(d)));
+    }
+    return dates;
+  };
+
+  // 예약 데이터 가져오기 (/api/host/bookings)
+  const fetchBookedDates = async () => {
+    try {
+      const token = localStorage.getItem('jwt');
+      const res = await axios.get('https://www.penbot.site/api/host/bookings', {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        // 서버가 월별 필터를 지원하지 않을 수 있으므로 전체를 받아 필터링
+      });
+      const bookings = Array.isArray(res.data) ? res.data : (res.data?.content || []);
+      const set = new Set<string>();
+      bookings.forEach((b: any) => {
+        if (!b.startDate || !b.endDate) return;
+        enumerateDates(b.startDate, b.endDate).forEach(ds => set.add(ds));
+      });
+      setBookedDateSet(set);
+    } catch (error) {
+      console.warn('예약 데이터 조회 실패 (비로그인 또는 권한 부족일 수 있음):', error);
+      // 실패 시 기존 상태 유지
+    }
+  };
+
+  useEffect(() => {
+    fetchBookedDates();
+  }, []);
+
+  useEffect(() => {
+    fetchBookedDates();
+  }, [currentDate]);
 
   // 현재 월의 첫 번째 날과 마지막 날 계산
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -53,21 +113,15 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
   };
 
   const handleDateClick = (date: Date) => {
-    // 오늘 이전 날짜는 선택 불가
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (date < today) return;
+    if (!isSelectableDate(date)) return;
 
     if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
-      // 시작 날짜 선택 또는 새로운 선택
       setSelectedStartDate(date);
       setSelectedEndDate(null);
     } else {
-      // 종료 날짜 선택
       if (date > selectedStartDate) {
         setSelectedEndDate(date);
       } else {
-        // 시작 날짜보다 이전 날짜를 선택한 경우 시작 날짜로 설정
         setSelectedStartDate(date);
         setSelectedEndDate(null);
       }
@@ -104,6 +158,12 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
     return date < today;
   };
 
+  // 예약 불가 여부
+  const isUnavailableDate = (date: Date) => bookedDateSet.has(toDateString(date));
+
+  // 선택 가능 여부
+  const isSelectableDate = (date: Date) => !isPastDate(date) && !isUnavailableDate(date);
+
   const getDateDisplay = () => {
     if (!selectedStartDate) return "날짜를 선택해주세요";
     
@@ -125,7 +185,7 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
     return `${startDateStr} ~ ${endDateStr} (${nights}박)`;
   };
 
-  // 종료일 없으면 +1 반환 ( 1일 예약 가능하게 함 )
+  // 종료일 없으면 +1 반환
   const getEndDateForAPI = () => {
     if (selectedEndDate) return selectedEndDate;
     if (selectedStartDate) {
@@ -139,7 +199,6 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
   const formatDate = (date: Date) => {
     return date.toISOString().slice(0, 10);
   };
-
 
   const handleCheckAvailability = async () => {
     if (!selectedStartDate ) {
@@ -331,33 +390,51 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
                   onClick={() => handleDateClick(date)}
                   style={{
                     background: isStartDate(date) || isEndDate(date) ? '#2196f3' : 
-                               isInRange(date) ? '#1976d2' : 'transparent',
+                               isInRange(date) ? '#1976d2' : 
+                               isUnavailableDate(date) ? '#f44336' : 'transparent',
                     border: isStartDate(date) || isEndDate(date) ? '2px solid #fff' : 'none',
                     borderRadius: 8,
-                    padding: '12px 8px',
+                    padding: '8px 6px',
                     fontSize: 14,
-                    color: isPastDate(date) ? '#444' : (isCurrentMonth(date) ? '#fff' : '#666'),
-                    cursor: isPastDate(date) ? 'not-allowed' : 'pointer',
+                    color: isPastDate(date) ? '#444' : 
+                           isUnavailableDate(date) ? '#fff' : 
+                           (isCurrentMonth(date) ? '#fff' : '#666'),
+                    cursor: isSelectableDate(date) ? 'pointer' : 'not-allowed',
                     position: 'relative',
-                    minHeight: '40px',
+                    minHeight: '52px',
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: isPastDate(date) ? 0.5 : 1
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    opacity: isPastDate(date) || isUnavailableDate(date) ? 0.7 : 1
                   }}
-                  disabled={isPastDate(date)}
+                  disabled={!isSelectableDate(date)}
                 >
-                  {date.getDate()}
-                  {isToday(date) && (
+                  <div style={{ width: '100%' }}>
                     <div style={{
-                      position: 'absolute',
-                      bottom: 2,
-                      width: 4,
-                      height: 4,
-                      backgroundColor: '#2196f3',
-                      borderRadius: '50%'
-                    }} />
-                  )}
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <span>{date.getDate()}</span>
+                      {isToday(date) && (
+                        <span style={{
+                          display: 'inline-block',
+                          width: 6,
+                          height: 6,
+                          backgroundColor: '#2196f3',
+                          borderRadius: '50%'
+                        }} />
+                      )}
+                    </div>
+                    <div style={{
+                      marginTop: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: isStartDate(date) || isEndDate(date) || isInRange(date) ? '#e3f2fd' : '#ddd'
+                    }}>
+                      {formatPriceShort(getPriceForDate(date))}
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>

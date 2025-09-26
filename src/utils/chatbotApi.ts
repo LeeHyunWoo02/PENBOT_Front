@@ -28,13 +28,12 @@ export const callGeminiAPI = async (text: string): Promise<ChatbotResponse> => {
 
     clearTimeout(timeoutId);
 
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error('챗봇 API 호출 중 오류 발생:', error);
     
     if (axios.isAxiosError(error)) {
-      // axios 에러 처리
+
       if (error.code === 'ECONNABORTED' || error.name === 'AbortError') {
         return {
           result: '죄송합니다. 응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.'
@@ -42,7 +41,6 @@ export const callGeminiAPI = async (text: string): Promise<ChatbotResponse> => {
       }
       
       if (error.response) {
-        // 서버에서 응답을 받았지만 에러 상태 코드인 경우
         const status = error.response.status;
         if (status === 404) {
           return {
@@ -65,7 +63,6 @@ export const callGeminiAPI = async (text: string): Promise<ChatbotResponse> => {
       }
       
       if (error.request) {
-        // 요청은 보냈지만 응답을 받지 못한 경우
         return {
           result: '죄송합니다. 네트워크 연결을 확인해 주세요.'
         };

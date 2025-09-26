@@ -30,7 +30,6 @@ const MyPage: React.FC = () => {
     profileImage: '',
   });
   useEffect(() => {
-    // 로그인 상태 확인
     const token = localStorage.getItem('jwt');
     if (!token || isTokenExpired(token)) {
       localStorage.removeItem('jwt');
@@ -39,7 +38,6 @@ const MyPage: React.FC = () => {
       return;
     }
 
-    // 사용자 정보 불러오기
     const fetchUserInfo = async () => {
       try {
         const res = await axios.get('https://www.penbot.site/api/user/search', {
@@ -50,7 +48,6 @@ const MyPage: React.FC = () => {
         setUserInfo(res.data);
       } catch (error: any) {
         if (error.response?.status === 401) {
-          // 401 Unauthorized - 토큰 만료
           localStorage.removeItem('jwt');
           alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
           navigate('/');

@@ -16,7 +16,6 @@ const PhoneVerificationPage: React.FC = () => {
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
-    // Move to next input if value entered
     if (value && index < 5) {
       const next = document.getElementById(`code-input-${index + 1}`);
       if (next) (next as HTMLInputElement).focus();
@@ -75,11 +74,9 @@ const PhoneVerificationPage: React.FC = () => {
         phone: phone,  
         code: codeValue
       });
-      
-      console.log('인증 응답:', response.data);
+  
       setSendMsg(response.data.message || '인증번호 인증에 성공했습니다.');
-      
-      // 인증 성공 시 휴대폰 번호를 localStorage에 저장하고 비밀번호 설정 페이지로 이동
+    
       localStorage.setItem('phone', phone);
       navigate('/password-setup');
     } catch (error: any) {

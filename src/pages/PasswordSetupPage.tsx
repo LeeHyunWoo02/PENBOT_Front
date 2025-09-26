@@ -9,16 +9,13 @@ const PasswordSetupPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [phone, setPhone] = useState('');
 
-  // 컴포넌트 마운트 시 휴대폰 번호 가져오기
   useEffect(() => {
-    // URL 파라미터에서 phone 가져오기
     const urlParams = new URLSearchParams(window.location.search);
     const phoneFromUrl = urlParams.get('phone');
     
     if (phoneFromUrl) {
       setPhone(phoneFromUrl);
     } else {
-      // localStorage에서 phone 가져오기 (이전 페이지에서 저장했다면)
       const savedPhone = localStorage.getItem('phone');
       if (savedPhone) {
         setPhone(savedPhone);
@@ -26,9 +23,7 @@ const PasswordSetupPage: React.FC = () => {
     }
   }, []);
 
-  // 비밀번호 유효성 검사 함수
   const validatePassword = (pw: string) => {
-    // 8자 이상, 숫자/대문자/특수문자 포함
     return /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(pw);
   };
 
@@ -57,7 +52,7 @@ const PasswordSetupPage: React.FC = () => {
       const response = await axios.post('https://www.penbot.site/api/user/update', 
         {
           password: password,
-          phone: phone  // phone 필드 추가
+          phone: phone  
         },
         {
           headers: {
