@@ -212,7 +212,7 @@ const DirectionsPage: React.FC<DirectionsPageProps> = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: 800, margin: '0 auto', flexWrap: 'wrap', gap: 20 }}>
           <div>
             <p style={{ fontSize: 16, color: '#666', marginBottom: 8 }}>위치: 경기도 안산시 단원구 멍골2길 11</p>
-            <p style={{ fontSize: 16, color: '#666' }}>연락처: (010) 5656-3642</p>
+            <p style={{ fontSize: 16, color: '#666' }}>연락처: 010-2661-7200</p>
           </div>
           <div style={{ textAlign: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: 20, marginBottom: 8 }}>

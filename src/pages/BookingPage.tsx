@@ -37,7 +37,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }
           maxWidth: 800,
           margin: '0 auto'
         }}>
-          예약 및 문의사항은 (010) 1234-5678로 연락해 주세요.
+          예약 및 문의사항은 010-2661-7200 로 연락해 주세요.
         </p>
       </div>
 
@@ -109,7 +109,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 4 }}>
                 전화
               </h3>
-              <p style={{ fontSize: 16, color: '#666' }}>(010) 1234-5678</p>
+              <p style={{ fontSize: 16, color: '#666' }}> 010-2661-7200</p>
             </div>
           </div>
           
@@ -119,7 +119,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#000', marginBottom: 4 }}>
                 문자
               </h3>
-              <p style={{ fontSize: 16, color: '#666' }}>(010) 9876-5432</p>
+              <p style={{ fontSize: 16, color: '#666' }}>010-2661-7200</p>
             </div>
           </div>
           
@@ -264,7 +264,7 @@ const BookingPage: React.FC<BookingPageProps> = ({ onLoginClick: _onLoginClick }
               위치: 경기도 안산시 단원구 멍골2길 11
             </p>
             <p style={{ fontSize: 16, color: '#666' }}>
-              연락처: (010) 1234-5678
+              연락처: 010-2661-7200
             </p>
           </div>
           

@@ -15,8 +15,8 @@ const Footer: React.FC = () => (
       gap: 120, 
       marginBottom: 16 
     }}>
-      <a href="#" style={{ color: '#999', textDecoration: 'none' }}>About Us</a>
-      <a href="#" style={{ color: '#999', textDecoration: 'none' }}>Contact</a>
+      <a href="https://github.com/LeeHyunWoo02/PENBOT" style={{ color: '#999', textDecoration: 'none' }}>About Us</a>
+      <a href="https://github.com/LeeHyunWoo02/PENBOT" style={{ color: '#999', textDecoration: 'none' }}>Contact</a>
       <a href="#" style={{ color: '#999', textDecoration: 'none' }}>Privacy Policy</a>
     </div>
     <div style={{ marginBottom: 8 }}>

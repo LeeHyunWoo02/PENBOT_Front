@@ -426,14 +426,16 @@ const BookingSystemPage: React.FC<BookingSystemPageProps> = ({ onLoginClick }) =
                         }} />
                       )}
                     </div>
-                    <div style={{
-                      marginTop: 6,
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: isStartDate(date) || isEndDate(date) || isInRange(date) ? '#e3f2fd' : '#ddd'
-                    }}>
-                      {formatPriceShort(getPriceForDate(date))}
-                    </div>
+                    {!isPastDate(date) && (
+                      <div style={{
+                        marginTop: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: isStartDate(date) || isEndDate(date) || isInRange(date) ? '#e3f2fd' : '#ddd'
+                      }}>
+                        {formatPriceShort(getPriceForDate(date))}
+                      </div>
+                    )}
                   </div>
                 </button>
               ))}
